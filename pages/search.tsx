@@ -18,6 +18,24 @@ import rangeMap from '@lib/range-map'
 // TODO(bc) Remove this. This should come from the API
 import getSlug from '@lib/get-slug'
 
+// Material-UI accordion
+import { makeStyles } from '@material-ui/core/styles'
+import Accordion from '@material-ui/core/Accordion'
+import AccordionSummary from '@material-ui/core/AccordionSummary'
+import AccordionDetails from '@material-ui/core/AccordionDetails'
+import Typography from '@material-ui/core/Typography'
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    width: '100%',
+  },
+  heading: {
+    fontSize: theme.typography.pxToRem(15),
+    fontWeight: theme.typography.fontWeightRegular,
+  },
+}))
+
 // TODO (bc) : Remove or standarize this.
 const SORT = Object.entries({
   'latest-desc': 'Latest arrivals',
@@ -66,9 +84,19 @@ export default function Search({
   const query = filterQuery({ sort })
 
   const { pathname, category, brand } = useSearchMeta(asPath)
-  const activeCategory = categories.find(
+  const flattenCategories = new Array()
+  categories.forEach((cat) => {
+    flattenCategories.push(cat)
+    cat.children.forEach((subcat) => flattenCategories.push(subcat))
+  })
+  console.log('search')
+  console.log(category)
+  flattenCategories.forEach((cat) => console.log(getSlug(cat.path)))
+  const activeCategory = flattenCategories.find(
     (cat) => getSlug(cat.path) === category
   )
+  console.log('activeCategory')
+  console.log(activeCategory?.name)
   const activeBrand = brands.find(
     (b) => getSlug(b.node.path) === `brands/${brand}`
   )?.node
@@ -88,6 +116,9 @@ export default function Search({
     }
     setActiveFilter(filter)
   }
+
+  // Material-UI accordion
+  const classes = useStyles()
 
   return (
     <Container>
@@ -158,34 +189,114 @@ export default function Search({
                         </a>
                       </Link>
                     </li>
-                    {categories.map((cat) => (
-                      <li
-                        key={cat.path}
-                        className={cn(
-                          'block text-sm leading-5 text-gray-700 hover:bg-gray-100 lg:hover:bg-transparent hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900',
-                          {
-                            underline:
-                              activeCategory?.entityId === cat.entityId,
-                          }
-                        )}
-                      >
-                        <Link
-                          href={{
-                            pathname: getCategoryPath(cat.path, brand),
-                            query,
-                          }}
-                        >
-                          <a
-                            onClick={(e) => handleClick(e, 'categories')}
-                            className={
-                              'block lg:inline-block px-4 py-2 lg:p-0 lg:my-2 lg:mx-4'
-                            }
+                    {categories.map(
+                      (cat) => (
+                        console.log(cat),
+                        (
+                          <li
+                            key={cat.path}
+                            className={cn(
+                              'block text-sm leading-5 text-gray-700 hover:bg-gray-100 lg:hover:bg-transparent hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900',
+                              {
+                                underline:
+                                  activeCategory?.entityId === cat.entityId,
+                              }
+                            )}
                           >
-                            {cat.name}
-                          </a>
-                        </Link>
-                      </li>
-                    ))}
+                            {cat.children.length > 0 ? (
+                              <Accordion>
+                                <AccordionSummary
+                                  expandIcon={<ExpandMoreIcon />}
+                                  aria-controls="panel1a-content"
+                                  id="panel1a-header"
+                                >
+                                  <Link
+                                    href={{
+                                      pathname: getCategoryPath(
+                                        cat.path,
+                                        brand
+                                      ),
+                                      query,
+                                    }}
+                                  >
+                                    <a
+                                      onClick={(e) =>
+                                        handleClick(e, 'categories')
+                                      }
+                                      className={
+                                        'block lg:inline-block px-4 py-2 lg:p-0 lg:my-2 lg:mx-4'
+                                      }
+                                    >
+                                      {cat.name}
+                                    </a>
+                                  </Link>
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                  <ul>
+                                    {cat.children.map(
+                                      (subcat) => (
+                                        console.log('subcat'),
+                                        console.log(subcat),
+                                        (
+                                          <li
+                                            key={subcat.path}
+                                            className={cn(
+                                              'block text-sm leading-5 text-gray-700 hover:bg-gray-100 lg:hover:bg-transparent hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900',
+                                              {
+                                                underline:
+                                                  activeCategory?.entityId ===
+                                                  subcat.entityId,
+                                              }
+                                            )}
+                                          >
+                                            <Link
+                                              href={{
+                                                pathname: getCategoryPath(
+                                                  subcat.path,
+                                                  brand
+                                                ),
+                                                query,
+                                              }}
+                                            >
+                                              <a
+                                                onClick={(e) =>
+                                                  handleClick(e, 'categories')
+                                                }
+                                                className={
+                                                  'block lg:inline-block px-4 py-2 lg:p-0 lg:my-2 lg:mx-4'
+                                                }
+                                              >
+                                                {subcat.name}
+                                              </a>
+                                            </Link>
+                                          </li>
+                                        )
+                                      )
+                                    )}
+                                  </ul>
+                                </AccordionDetails>
+                              </Accordion>
+                            ) : (
+                              <Link
+                                href={{
+                                  pathname: getCategoryPath(cat.path, brand),
+                                  query,
+                                }}
+                              >
+                                <a
+                                  onClick={(e) => handleClick(e, 'categories')}
+                                  className={
+                                    'block lg:inline-block px-4 py-2 lg:p-0 lg:my-2 lg:mx-4'
+                                  }
+                                >
+                                  {cat.name}
+                                </a>
+                              </Link>
+                            )}
+                          </li>
+                        )
+                      )
+                    )}
                   </ul>
                 </div>
               </div>

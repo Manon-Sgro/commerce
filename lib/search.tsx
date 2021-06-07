@@ -10,16 +10,23 @@ export function useSearchMeta(asPath: string) {
     // Only access asPath after hydration to avoid a server mismatch
     const path = asPath.split('?')[0]
     const parts = path.split('/')
+    console.log('parts')
+    console.log(parts)
 
     let c = parts[2]
     let b = parts[3]
+    let s = parts[4]
 
     if (c === 'designers') {
       c = parts[4]
+      s = parts[5]
+    } else {
+      s = parts[3]
+      b = parts[4]
     }
 
     setPathname(path)
-    if (c !== category) setCategory(c)
+    if (c + (s ? '/' + s : '') !== category) setCategory(c + (s ? '/' + s : ''))
     if (b !== brand) setBrand(b)
   }, [asPath])
 
