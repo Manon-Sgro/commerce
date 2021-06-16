@@ -78,10 +78,14 @@ export default function Search({
   const router = useRouter()
   const { asPath } = router
   const { q, sort } = router.query
+  console.log('q')
+  console.log(q)
   // `q` can be included but because categories and designers can't be searched
   // in the same way of products, it's better to ignore the search input if one
   // of those is selected
-  const query = filterQuery({ sort })
+  const query = filterQuery({ q, sort })
+  console.log('q2')
+  console.log(q)
 
   const { pathname, category, brand } = useSearchMeta(asPath)
   const flattenCategories = new Array()
@@ -91,7 +95,7 @@ export default function Search({
   })
   console.log('search')
   console.log(category)
-  flattenCategories.forEach((cat) => console.log(getSlug(cat.path)))
+  //flattenCategories.forEach((cat) => console.log(getSlug(cat.path)))
   const activeCategory = flattenCategories.find(
     (cat) => getSlug(cat.path) === category
   )
@@ -189,94 +193,24 @@ export default function Search({
                         </a>
                       </Link>
                     </li>
-                    {categories.map(
-                      (cat) => (
-                        console.log(cat),
-                        (
-                          <li
-                            key={cat.path}
-                            className={cn(
-                              'block text-sm leading-5 text-gray-700 hover:bg-gray-100 lg:hover:bg-transparent hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900',
-                              {
-                                underline:
-                                  activeCategory?.entityId === cat.entityId,
-                              }
-                            )}
-                          >
-                            {cat.children.length > 0 ? (
-                              <Accordion>
-                                <AccordionSummary
-                                  expandIcon={<ExpandMoreIcon />}
-                                  aria-controls="panel1a-content"
-                                  id="panel1a-header"
-                                >
-                                  <Link
-                                    href={{
-                                      pathname: getCategoryPath(
-                                        cat.path,
-                                        brand
-                                      ),
-                                      query,
-                                    }}
-                                  >
-                                    <a
-                                      onClick={(e) =>
-                                        handleClick(e, 'categories')
-                                      }
-                                      className={
-                                        'block lg:inline-block px-4 py-2 lg:p-0 lg:my-2 lg:mx-4'
-                                      }
-                                    >
-                                      {cat.name}
-                                    </a>
-                                  </Link>
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                  <ul>
-                                    {cat.children.map(
-                                      (subcat) => (
-                                        console.log('subcat'),
-                                        console.log(subcat),
-                                        (
-                                          <li
-                                            key={subcat.path}
-                                            className={cn(
-                                              'block text-sm leading-5 text-gray-700 hover:bg-gray-100 lg:hover:bg-transparent hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900',
-                                              {
-                                                underline:
-                                                  activeCategory?.entityId ===
-                                                  subcat.entityId,
-                                              }
-                                            )}
-                                          >
-                                            <Link
-                                              href={{
-                                                pathname: getCategoryPath(
-                                                  subcat.path,
-                                                  brand
-                                                ),
-                                                query,
-                                              }}
-                                            >
-                                              <a
-                                                onClick={(e) =>
-                                                  handleClick(e, 'categories')
-                                                }
-                                                className={
-                                                  'block lg:inline-block px-4 py-2 lg:p-0 lg:my-2 lg:mx-4'
-                                                }
-                                              >
-                                                {subcat.name}
-                                              </a>
-                                            </Link>
-                                          </li>
-                                        )
-                                      )
-                                    )}
-                                  </ul>
-                                </AccordionDetails>
-                              </Accordion>
-                            ) : (
+                    {categories.map((cat) => (
+                      <li
+                        key={cat.path}
+                        className={cn(
+                          'block text-sm leading-5 text-gray-700 hover:bg-gray-100 lg:hover:bg-transparent hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900',
+                          {
+                            underline:
+                              activeCategory?.entityId === cat.entityId,
+                          }
+                        )}
+                      >
+                        {cat.children.length > 0 ? (
+                          <Accordion>
+                            <AccordionSummary
+                              expandIcon={<ExpandMoreIcon />}
+                              aria-controls="panel1a-content"
+                              id="panel1a-header"
+                            >
                               <Link
                                 href={{
                                   pathname: getCategoryPath(cat.path, brand),
@@ -292,11 +226,65 @@ export default function Search({
                                   {cat.name}
                                 </a>
                               </Link>
-                            )}
-                          </li>
-                        )
-                      )
-                    )}
+                            </AccordionSummary>
+                            <AccordionDetails>
+                              <ul>
+                                {cat.children.map((subcat) => (
+                                  <li
+                                    key={subcat.path}
+                                    className={cn(
+                                      'block text-sm leading-5 text-gray-700 hover:bg-gray-100 lg:hover:bg-transparent hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900',
+                                      {
+                                        underline:
+                                          activeCategory?.entityId ===
+                                          subcat.entityId,
+                                      }
+                                    )}
+                                  >
+                                    <Link
+                                      href={{
+                                        pathname: getCategoryPath(
+                                          subcat.path,
+                                          brand
+                                        ),
+                                        query,
+                                      }}
+                                    >
+                                      <a
+                                        onClick={(e) =>
+                                          handleClick(e, 'categories')
+                                        }
+                                        className={
+                                          'block lg:inline-block px-4 py-2 lg:p-0 lg:my-2 lg:mx-4'
+                                        }
+                                      >
+                                        {subcat.name}
+                                      </a>
+                                    </Link>
+                                  </li>
+                                ))}
+                              </ul>
+                            </AccordionDetails>
+                          </Accordion>
+                        ) : (
+                          <Link
+                            href={{
+                              pathname: getCategoryPath(cat.path, brand),
+                              query,
+                            }}
+                          >
+                            <a
+                              onClick={(e) => handleClick(e, 'categories')}
+                              className={
+                                'block lg:inline-block px-4 py-2 lg:p-0 lg:my-2 lg:mx-4'
+                              }
+                            >
+                              {cat.name}
+                            </a>
+                          </Link>
+                        )}
+                      </li>
+                    ))}
                   </ul>
                 </div>
               </div>

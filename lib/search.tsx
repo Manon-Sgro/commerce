@@ -8,10 +8,12 @@ export function useSearchMeta(asPath: string) {
 
   useEffect(() => {
     // Only access asPath after hydration to avoid a server mismatch
-    const path = asPath.split('?')[0]
+    const splitPath = asPath.split('?')
+    const path = splitPath[0]
+    const query = splitPath.length > 1 ? '?' + splitPath[1] : ''
     const parts = path.split('/')
-    console.log('parts')
-    console.log(parts)
+    console.log('query')
+    console.log(query)
 
     let c = parts[2]
     let b = parts[3]
@@ -25,8 +27,9 @@ export function useSearchMeta(asPath: string) {
       b = parts[4]
     }
 
-    setPathname(path)
-    if (c + (s ? '/' + s : '') !== category) setCategory(c + (s ? '/' + s : ''))
+    setPathname(path + query)
+    if (c && c + (s ? '/' + s : '') !== category)
+      setCategory(c + (s ? '/' + s : ''))
     if (b !== brand) setBrand(b)
   }, [asPath])
 
