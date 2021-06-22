@@ -11,10 +11,11 @@ interface Props {
   className?: string
   link?: string
   title?: string
+  subtitle?: string
   imageSrc?: string
   imageSrc2?: string
   product?: Product
-  variant?: 'simple' | 'details'
+  variant?: 'simple' | 'details' | 'full'
   imgProps?: Omit<ImageProps, 'src'>
 }
 
@@ -24,6 +25,7 @@ const ProductCard2: FC<Props> = ({
   className,
   link = '',
   title,
+  subtitle,
   imageSrc,
   imageSrc2 = '',
   product,
@@ -32,72 +34,106 @@ const ProductCard2: FC<Props> = ({
   ...props
 }) => (
   <div>
-    {variant === 'simple' ? (
+    {variant === 'simple' && (
       <Link href={link} {...props}>
         <a>
-          <div className="s.container">
-            <div className="s.container_tag">
-              <span>{title}</span>
-            </div>
+          <div className={s.container}>
             <Image
               quality="85"
               src={imageSrc || placeholderImg}
               alt={title || 'Product Image'}
-              height={320}
-              width={320}
+              height={256}
+              width={206}
+              objectFit="cover"
               layout="fixed"
               {...imgProps}
             />
+            <div className={s.container_tag}>
+              <span>{title}</span>
+            </div>
           </div>
         </a>
       </Link>
-    ) : (
-      <div className="s.container">
-        <Link href={link} {...props}>
-          <div className="s.container_image">
-            <div className="s.container_image_thumbnail">
-              <Image
-                quality="85"
-                src={imageSrc || placeholderImg}
-                alt={title || 'Product Image'}
-                height={320}
-                width={320}
-                layout="fixed"
-                {...imgProps}
-              />
+    )}
+    {variant === 'full' && (
+      <Link href={link} {...props}>
+        <a>
+          <div className={s.container__full}>
+            <Image
+              quality="85"
+              src={imageSrc || placeholderImg}
+              alt={title || 'Product Image'}
+              height={600}
+              width={600}
+              objectFit="cover"
+              layout="fixed"
+              {...imgProps}
+            />
+            <div className={s.container_tag__noBg}>
+              <div className={s.title}>{title}</div>
+              <div className={s.subtitle}>{subtitle}</div>
             </div>
-            {imageSrc2 != '' && (
-              <div className="s.container_image_thumbnail">
+          </div>
+        </a>
+      </Link>
+    )}
+    {variant === 'details' && (
+      <div className={s.container}>
+        <Link href={link} {...props}>
+          <a>
+            <div className={s.container_image}>
+              <div
+                className={`${s.container_image_thumbnail} ${
+                  imageSrc2 != '' ? s.toHide : ''
+                }`}
+              >
                 <Image
                   quality="85"
-                  src={imageSrc2 || placeholderImg}
+                  src={imageSrc || placeholderImg}
                   alt={title || 'Product Image'}
-                  height={320}
-                  width={320}
+                  height={256}
+                  width={206}
+                  objectFit="contain"
                   layout="fixed"
                   {...imgProps}
                 />
               </div>
-            )}
-          </div>
+              {imageSrc2 != '' && (
+                <div className={s.container_image_thumbnail}>
+                  <Image
+                    quality="85"
+                    src={imageSrc2 || placeholderImg}
+                    alt={title || 'Product Image'}
+                    height={256}
+                    width={206}
+                    objectFit="contain"
+                    layout="fixed"
+                    {...imgProps}
+                  />
+                </div>
+              )}
+            </div>
+          </a>
         </Link>
         <Link href={link} {...props}>
-          <h3 className={s.productTitle}>
-            <span>{title}</span>
-          </h3>
+          <a>
+            <h3 className={s.product_title}>
+              <span>{title}</span>
+            </h3>
+          </a>
         </Link>
         {product && (
-          <div className={s.productPrice}>
-            <div className={s.productPrice_price}>
+          <div className={s.product_price}>
+            <div className={s.product_price_text}>
               {product.price.value}
               &nbsp;
               {product.price.currencyCode}
             </div>
-            <Link href={link} {...props}>
-              {product.price.value}
-              &nbsp;
-              {product.price.currencyCode}
-            </Link>
+            <div>
+              <Link href={link} {...props}>
+                <a className={s.btn}>Ajouter au panier</a>
+              </Link>
+            </div>
           </div>
         )}
       </div>
