@@ -1,0 +1,19 @@
+.section {
+  min-height: 80vh;
+  padding:4rem;
+
+  display:flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.section_title{
+    font-size:2rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+}
+
+.section_titlePart{
+    max-width:45vw;
+    text-align:center;
+}
