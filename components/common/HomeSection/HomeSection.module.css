@@ -1,0 +1,23 @@
+.section {
+  background-image: url("public/legumes.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: right center;
+
+  min-height: 80vh;
+  padding:4rem;
+
+  color:#fff;
+  display: flex;
+  align-items:center;
+}
+
+.section_title{
+    font-size:5rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+}
+
+.section_titlePart{
+    max-width:45vw;
+}
