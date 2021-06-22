@@ -7,6 +7,7 @@ import useCustomer from '@framework/customer/use-customer'
 import { Avatar } from '@components/common'
 import { Heart, Bag } from '@components/icons'
 import { useUI } from '@components/ui/context'
+import useWishlist from '@framework/wishlist/use-wishlist'
 import DropdownMenu from './DropdownMenu'
 import s from './UserNav.module.css'
 
@@ -18,6 +19,9 @@ const countItem = (count: number, item: LineItem) => count + item.quantity
 
 const UserNav: FC<Props> = ({ className }) => {
   const { data } = useCart()
+  const { data: wishlist, isLoading, isEmpty } = useWishlist({
+    includeProducts: true,
+  })
   const { data: customer } = useCustomer()
   const { toggleSidebar, closeSidebarIfPresent, openModal } = useUI()
   const itemsCount = data?.lineItems.reduce(countItem, 0) ?? 0
@@ -26,10 +30,6 @@ const UserNav: FC<Props> = ({ className }) => {
     <nav className={cn(s.root, className)}>
       <div className={s.mainContainer}>
         <ul className={s.list}>
-          <li className={s.item} onClick={toggleSidebar}>
-            <Bag />
-            {itemsCount > 0 && <span className={s.bagCount}>{itemsCount}</span>}
-          </li>
           {process.env.COMMERCE_WISHLIST_ENABLED && (
             <li className={s.item}>
               <Link href="/wishlist">
@@ -37,8 +37,17 @@ const UserNav: FC<Props> = ({ className }) => {
                   <Heart />
                 </a>
               </Link>
+              {
+                <span className={s.bagCount}>
+                  {wishlist ? wishlist?.items?.length : '0'}
+                </span>
+              }
             </li>
           )}
+          <li className={s.item} onClick={toggleSidebar}>
+            <Bag />
+            {<span className={s.bagCount}>{itemsCount}</span>}
+          </li>
           <li className={s.item}>
             {customer ? (
               <DropdownMenu />
