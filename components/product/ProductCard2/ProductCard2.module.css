@@ -98,6 +98,8 @@
 .title{
     font-size:2rem;
     font-weight: bold;
+    max-width:13rem;
+    margin-bottom:1.5rem;
 }
 
 .subtitle {
