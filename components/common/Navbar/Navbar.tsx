@@ -19,7 +19,7 @@ const Navbar: FC = () => (
           <nav className="hidden ml-6 space-x-4 lg:block">
             <Link href="/search">
               <a className={s.link}>
-                <span>All</span>
+                <span>Tous nos produits</span>
               </a>
             </Link>
             <Link href="/search/fruits">
