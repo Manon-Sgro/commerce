@@ -19,6 +19,9 @@ export function useSearchMeta(asPath: string) {
     let b = parts[3]
     let s = parts[4]
 
+    console.log('and the category is...')
+    console.log(c)
+
     if (c === 'designers') {
       c = parts[4]
       s = parts[5]
@@ -30,6 +33,7 @@ export function useSearchMeta(asPath: string) {
     setPathname(path + query)
     if (c && c + (s ? '/' + s : '') !== category)
       setCategory(c + (s ? '/' + s : ''))
+    if (c === undefined && c !== category) setCategory('')
     if (b !== brand) setBrand(b)
   }, [asPath])
 

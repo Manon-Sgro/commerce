@@ -1,4 +1,11 @@
-.root {
+.root{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    margin-left:1.5rem;
+}
+
+.root_bg {
   position: absolute;
   top: 0;
   left: 0;
@@ -42,5 +49,10 @@
 }
 
 .icon__cross{
+    display:flex;
     margin-left:auto;
+}
+
+.hidden{
+    display:none;
 }

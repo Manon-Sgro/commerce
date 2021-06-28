@@ -20,37 +20,33 @@ const Navbar: FC = () => (
             <Link href="/search">
               <a className={s.link}>
                 <span>All</span>
+              </a>
+            </Link>
+            <Link href="/search/fruits">
+              <a className={s.link}>
+                Fruits
                 <ArrowDown className={s.icon} width={15} height={15} />
               </a>
             </Link>
-            <Link href="/search?q=clothes">
+            <Link href="/search/legumes">
               <a className={s.link}>
-                Clothes
+                Légumes
                 <ArrowDown className={s.icon} width={15} height={15} />
               </a>
             </Link>
-            <Link href="/search?q=accessories">
+            <Link href="/search/paniers">
               <a className={s.link}>
-                Accessories
-                <ArrowDown className={s.icon} width={15} height={15} />
-              </a>
-            </Link>
-            <Link href="/search?q=shoes">
-              <a className={s.link}>
-                Shoes
+                Paniers composés
                 <ArrowDown className={s.icon} width={15} height={15} />
               </a>
             </Link>
           </nav>
         </div>
 
-        <div className="flex justify-end flex-1 space-x-8">
+        <div className="flex justify-end flex-1">
           <UserNav />
+          <Searchbar id="mobile-search" />
         </div>
-      </div>
-
-      <div className="flex pb-4 lg:px-6">
-        <Searchbar id="mobile-search" />
       </div>
     </Container>
   </NavbarRoot>
