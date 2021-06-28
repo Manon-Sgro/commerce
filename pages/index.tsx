@@ -1,7 +1,7 @@
 import { Layout } from '@components/common'
 import { Grid, Marquee, Hero, Button } from '@components/ui'
 import { ProductCard, ProductCard2 } from '@components/product'
-import { HomeSection, HomeGrid } from '@components/common'
+import { HomeSection, HomeGrid, TopButton } from '@components/common'
 // import HomeAllProductsGrid from '@components/common/HomeAllProductsGrid'
 import type { GetStaticPropsContext, InferGetStaticPropsType } from 'next'
 
@@ -45,6 +45,7 @@ export default function Home({
   return (
     <>
       <HomeSection></HomeSection>
+      <TopButton />
       <HomeGrid
         title="Top des ventes"
         subtitle="Ajoutez nos meilleurs produits à votre panier."
