@@ -45,7 +45,6 @@ export default function Home({
   return (
     <>
       <HomeSection></HomeSection>
-      <TopButton />
       <HomeGrid
         title="Top des ventes"
         subtitle="Ajoutez nos meilleurs produits à votre panier."
@@ -149,6 +148,7 @@ export default function Home({
           }}
         />
       </HomeGrid>
+      <TopButton />
     </>
   )
 }

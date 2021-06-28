@@ -17,7 +17,7 @@ const ArrowUp: FC<Props> = ({ width = 24, height = 24, ...props }) => {
       {...props}
     >
       <path
-        d="M5 12L12 19L19 12"
+        d="M5 12L12 5L19 12"
         strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"

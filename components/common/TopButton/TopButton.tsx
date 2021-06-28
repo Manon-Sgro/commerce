@@ -20,14 +20,23 @@ const TopButton: FC<Props> = ({ className, id = 'home' }) => {
   */
   return useMemo(
     () => (
-      <Link>
+      <button
+        onClick={() => {
+          window.scroll({
+            top: 0,
+            left: 0,
+            behavior: 'smooth',
+          })
+        }}
+        className={s.root}
+      >
+        <div className={s.container_filled}></div>
         <div className={s.container}>
-          <div className={s.container_filled}></div>
           <div className={s.container_icon}>
-            <ArrowUp />
+            <ArrowUp width={40} height={40} />
           </div>
         </div>
-      </Link>
+      </button>
     ),
     []
   )
