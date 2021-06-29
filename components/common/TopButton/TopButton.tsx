@@ -19,16 +19,17 @@ const TopButton: FC<Props> = ({ className, id = 'home' }) => {
   }, [])
   */
   const [scrollHeight, setScrollHeight] = useState(307.919)
+  const [topButtonActive, setTopButtonActive] = useState(false)
   useEffect(() => {
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   const handleScroll = () => {
-    setScrollHeight(
+    const newScroll =
       307.919 - (307.919 * window.scrollY) / document.body.offsetHeight
-    )
-    console.log(scrollHeight)
+    setScrollHeight(newScroll)
+    newScroll < 307.919 ? setTopButtonActive(true) : setTopButtonActive(false)
   }
 
   return (
@@ -40,7 +41,7 @@ const TopButton: FC<Props> = ({ className, id = 'home' }) => {
           behavior: 'smooth',
         })
       }}
-      className={s.root}
+      className={`${s.root} ${topButtonActive ? s.active : s.inactive}`}
     >
       <div className={s.container}>
         <div className={s.container_icon}>
