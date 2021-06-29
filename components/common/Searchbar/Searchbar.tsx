@@ -19,7 +19,7 @@ const Searchbar: FC<Props> = ({ className, id = 'search' }) => {
     router.prefetch('/search')
   }, [])
 
-  const [display, setDisplay] = useState(true)
+  const [display, setDisplay] = useState(false)
 
   return (
     <div
