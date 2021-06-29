@@ -2,13 +2,24 @@
   @apply sticky top-0 bg-primary z-40 transition-all duration-150;
 }
 
-.link {
-  @apply inline-flex items-center text-primary leading-6 font-medium transition ease-in-out duration-75 cursor-pointer text-accents-6;
+.icon{
+    margin-left:.5rem;
 }
 
-.link:hover {
-  @apply text-accents-9;
+.link {
+  @apply inline-flex items-center text-primary leading-6 font-medium transition ease-in-out duration-75 cursor-pointer text-accents-6;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size:.9rem;
+  color:black;
+  transition: all .2s;
 }
+
+  .link:hover {
+    @apply text-accents-9;
+    color: #545454;
+    transition: all .2s;
+  }
 
 .link:focus {
   @apply outline-none text-accents-8;

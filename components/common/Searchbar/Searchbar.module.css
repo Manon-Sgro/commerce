@@ -1,6 +1,31 @@
+.root{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    margin-left:1.5rem;
+
+    position: inherit;
+}
+
+.root_bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.3);
+  width:100vw;
+  height:100vh;
+}
+.root_searchbar{
+    background:#fff;
+    padding:4rem;
+}
+
 .input {
   @apply bg-transparent px-3 py-2 appearance-none w-full transition duration-150 ease-in-out pr-10;
-
+  padding:.4rem 0 1.2rem 0;
+  font-weight:bold;
+  font-size:3.5rem;
+  border-bottom:2px solid rgba(84, 84, 84, 0.1);
   @screen sm {
     min-width: 300px;
   }
@@ -16,4 +41,20 @@
 
 .icon {
   @apply h-5 w-5;
+}
+
+.label {
+  text-transform: uppercase;
+  font-size: .75rem;
+  font-weight: bold;
+  color: rgba(84, 84, 84, 0.55);
+}
+
+.icon__cross{
+    display:flex;
+    margin-left:auto;
+}
+
+.hidden{
+    display:none;
 }
