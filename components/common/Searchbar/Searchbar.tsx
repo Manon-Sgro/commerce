@@ -5,6 +5,7 @@ import { useRouter } from 'next/router'
 import { Cross } from '@components/icons'
 import { Button } from '../../ui'
 import Link from 'next/link'
+import ClickOutside from '../../../lib/click-outside'
 
 interface Props {
   className?: string
@@ -18,35 +19,37 @@ const Searchbar: FC<Props> = ({ className, id = 'search' }) => {
     router.prefetch('/search')
   }, [])
 
-  let show = true
-  const [hidden, setHidden] = useState(true)
-  function toggle() {
-    setHidden(!hidden)
-  }
+  const [display, setDisplay] = useState(true)
 
-  return useMemo(
-    () => (
-      <div
-        className={`${cn(
-          'relative text-sm text-base transition-colors duration-150',
-          className
-        )} ${s.root}`}
+  return (
+    <div
+      className={`${cn(
+        'relative text-sm text-base transition-colors duration-150',
+        className
+      )} ${s.root}`}
+    >
+      <button
+        className={s.icon_container__small}
+        onClick={() => setDisplay(true)}
       >
-        <div className={s.icon_container__small}>
-          <svg className={s.icon} fill="currentColor" viewBox="0 0 20 20">
-            <path
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-            />
-          </svg>
-        </div>
-        {!hidden && (
-          <div className={s.root_bg}>
+        <svg className={s.icon} fill="currentColor" viewBox="0 0 20 20">
+          <path
+            fillRule="evenodd"
+            clipRule="evenodd"
+            d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+          />
+        </svg>
+      </button>
+      {display ? (
+        <div className={s.root_bg}>
+          <ClickOutside active={display} onClick={() => setDisplay(false)}>
             <div className={s.root_searchbar}>
-              <a className={s.icon__cross} onClick={() => setHidden(true)}>
+              <button
+                className={s.icon__cross}
+                onClick={() => setDisplay(false)}
+              >
                 <Cross />
-              </a>
+              </button>
               <label className={s.label} htmlFor={id}>
                 Que cherchez-vous ?
               </label>
@@ -82,11 +85,10 @@ const Searchbar: FC<Props> = ({ className, id = 'search' }) => {
                 </svg>
               </div>
             </div>
-          </div>
-        )}
-      </div>
-    ),
-    []
+          </ClickOutside>
+        </div>
+      ) : null}
+    </div>
   )
 }
 

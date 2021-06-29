@@ -9,7 +9,7 @@ import { getConfig } from '@framework/api'
 import getAllProducts from '@framework/product/get-all-products'
 import getSiteInfo from '@framework/common/get-site-info'
 import getAllPages from '@framework/common/get-all-pages'
-//import HomeGrid from '../components/common/HomeGrid'
+// import HomeGrid from '../components/common/HomeGrid'
 
 export async function getStaticProps({
   preview,
