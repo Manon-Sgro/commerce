@@ -7,17 +7,114 @@
     position: inherit;
 }
 
-.root_bg {
+@keyframes opacityTransitionOn {
+  /*0%{
+        opacity: 0;
+        height:0;
+        display: none;
+    }
+    */
+  0% {
+    opacity: 0;
+    height: 100vh;
+    display: block;
+  }
+
+  100% {
+    opacity: 1;
+    height: 100vh;
+    display: block;
+  }
+}
+
+@keyframes opacityTransitionOff {
+  0% {
+    opacity: 1;
+    height: 100vh;
+    display: block;
+  }
+
+  99% {
+    opacity: 0;
+    height: 100vh;
+    display: block;
+  }
+
+  100% {
+    opacity: 0;
+    height: 0vh;
+    display: none;
+  }
+  /*
+  100% {
+    opacity: 0;
+    height: 0;
+    display: none;
+  }
+      */
+}
+
+@keyframes slideInTransition {
+  0% {
+    transform: translateY(-100%);
+  }
+
+  100% {
+    transform: translateY(0%);
+  }
+}
+
+@keyframes slideOutTransition {
+  0% {
+    transform: translateY(0%);
+  }
+
+  99% {
+    transform: translateY(-100%);
+  }
+}
+
+.root_bg.active {
   position: fixed;
   top: 0;
   left: 0;
   background: rgba(0, 0, 0, 0.3);
-  width:100vw;
-  height:100vh;
+  width: 100vw;
+  height: 100vh;
+  display:block;
+  animation: opacityTransitionOn 1s forwards;
 }
-.root_searchbar{
-    background:#fff;
-    padding:4rem;
+
+.root_bg.inactive {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.3);
+  width: 100vw;
+  //height: 100vh;
+  opacity: 0;
+  height: 0;
+  display: block;
+  animation: opacityTransitionOff 1s forwards;
+}
+
+.inactive .root_searchbar {
+  background: #fff;
+  padding: 4rem;
+  transform: translateY(-100%);
+  animation: slideOutTransition 1s forwards;
+}
+
+.active .root_searchbar {
+  background: #fff;
+  padding: 4rem;
+  animation: slideInTransition 1s forwards;
+}
+
+.input_container{
+    display:flex;
+    align-items:center;
+    position:relative;
 }
 
 .input {
@@ -26,6 +123,9 @@
   font-weight:bold;
   font-size:3.5rem;
   border-bottom:2px solid rgba(84, 84, 84, 0.1);
+  width:100%;
+  padding-right:5rem;
+
   @screen sm {
     min-width: 300px;
   }
@@ -33,15 +133,28 @@
 
 .input:focus {
   @apply outline-none shadow-outline-normal;
+  box-shadow:none;
 }
 
 .iconContainer {
   @apply absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none;
+  position: absolute;
+  right:0;
+}
+
+.icon_small {
+  @apply h-5 w-5;
 }
 
 .icon {
   @apply h-5 w-5;
+  width: 3.5rem;
+  height: 3.5rem;
 }
+
+  .icon path {
+    fill: #9ca3af;
+  }
 
 .label {
   text-transform: uppercase;

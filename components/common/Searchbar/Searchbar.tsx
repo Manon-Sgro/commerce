@@ -20,6 +20,11 @@ const Searchbar: FC<Props> = ({ className, id = 'search' }) => {
   }, [])
 
   const [display, setDisplay] = useState(false)
+  const [currentQuery, setCurrentQuery] = useState('')
+
+  const activeSearchbar = () => {
+    setDisplay(true)
+  }
 
   return (
     <div
@@ -32,7 +37,7 @@ const Searchbar: FC<Props> = ({ className, id = 'search' }) => {
         className={s.icon_container__small}
         onClick={() => setDisplay(true)}
       >
-        <svg className={s.icon} fill="currentColor" viewBox="0 0 20 20">
+        <svg className={s.icon_small} fill="currentColor" viewBox="0 0 20 20">
           <path
             fillRule="evenodd"
             clipRule="evenodd"
@@ -40,19 +45,16 @@ const Searchbar: FC<Props> = ({ className, id = 'search' }) => {
           />
         </svg>
       </button>
-      {display ? (
-        <div className={s.root_bg}>
-          <ClickOutside active={display} onClick={() => setDisplay(false)}>
-            <div className={s.root_searchbar}>
-              <button
-                className={s.icon__cross}
-                onClick={() => setDisplay(false)}
-              >
-                <Cross />
-              </button>
-              <label className={s.label} htmlFor={id}>
-                Que cherchez-vous ?
-              </label>
+      <div className={`${s.root_bg} ${display ? s.active : s.inactive}`}>
+        <ClickOutside active={display} onClick={() => setDisplay(false)}>
+          <div className={s.root_searchbar}>
+            <button className={s.icon__cross} onClick={() => setDisplay(false)}>
+              <Cross />
+            </button>
+            <label className={s.label} htmlFor={id}>
+              Que cherchez-vous ?
+            </label>
+            <div className={s.input_container}>
               <input
                 id={id}
                 className={s.input}
@@ -63,6 +65,7 @@ const Searchbar: FC<Props> = ({ className, id = 'search' }) => {
 
                   if (e.key === 'Enter') {
                     const q = e.currentTarget.value
+                    setCurrentQuery(q)
 
                     router.push(
                       {
@@ -72,6 +75,7 @@ const Searchbar: FC<Props> = ({ className, id = 'search' }) => {
                       undefined,
                       { shallow: true }
                     )
+                    setDisplay(false)
                   }
                 }}
               />
@@ -85,9 +89,9 @@ const Searchbar: FC<Props> = ({ className, id = 'search' }) => {
                 </svg>
               </div>
             </div>
-          </ClickOutside>
-        </div>
-      ) : null}
+          </div>
+        </ClickOutside>
+      </div>
     </div>
   )
 }
