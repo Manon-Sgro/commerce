@@ -28,7 +28,7 @@ const Searchbar: FC<Props> = ({ className, id = 'search' }) => {
     search: currentQuery,
   })
 
-  const quickSearch = (query) => {
+  const quickSearch = (query: string) => {
     console.log('quicksearch:')
     console.log(query)
     if (query.length > 0 && searchFunction.data?.found) {
