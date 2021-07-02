@@ -33,3 +33,64 @@
     transform: scale(1.05);
   }
 }
+
+.link__floating{
+    display:inline-flex;
+    position:relative; /*needed for floating sub-menus*/
+}
+
+@keyframes opacityTransitionOn {
+  0% {
+    display: none;
+    height: 0;
+    padding: 0;
+    opacity: 0;
+  }
+  1% {
+    opacity: 0;
+    height: 500px;
+    padding: 2rem;
+    display: block;
+  }
+
+  100% {
+    opacity: 1;
+    height: 500px;
+    padding: 2rem;
+    display: block;
+  }
+}
+
+@keyframes opacityTransitionOff {
+  0% {
+    opacity: 1;
+    height: 500px;
+    padding: 2rem;
+    display: block;
+  }
+
+  99% {
+    opacity: 0;
+    height: 500px;
+    padding: 2rem;
+    display: block;
+  }
+  100%{
+      opacity: 0;
+      height:0;
+      padding:0;
+      display:none;
+  }
+}
+
+.link__floating .link__floating_floatingMenu {
+    opacity:0;
+    height:0;
+  animation: opacityTransitionOff .2s forwards;
+}
+
+.link__floating:hover .link__floating_floatingMenu, .link__floating:focus .link__floating_floatingMenu {
+  display: block;
+  height:500px;
+  animation: opacityTransitionOn .2s forwards;
+}

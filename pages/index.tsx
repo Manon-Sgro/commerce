@@ -73,7 +73,7 @@ export default function Home({
         layout="A"
       >
         <ProductCard2
-          link=""
+          link="/search/fruits"
           title="Fruits"
           variant="simple"
           imageSrc="/cat_fruits.png"
@@ -83,7 +83,7 @@ export default function Home({
           }}
         />
         <ProductCard2
-          link=""
+          link="/search/legumes"
           title="Légumes"
           variant="simple"
           imageSrc="/cat_legumes.jpg"
@@ -93,7 +93,7 @@ export default function Home({
           }}
         />
         <ProductCard2
-          link=""
+          link="/search/jus"
           title="Jus"
           variant="simple"
           imageSrc="/cat_jus.png"

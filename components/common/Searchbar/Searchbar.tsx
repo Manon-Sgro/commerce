@@ -2,10 +2,12 @@ import { FC, useEffect, useMemo, useState } from 'react'
 import cn from 'classnames'
 import s from './Searchbar.module.css'
 import { useRouter } from 'next/router'
+import useSearch from '@framework/product/use-search'
 import { Cross } from '@components/icons'
 import { Button } from '../../ui'
 import Link from 'next/link'
 import ClickOutside from '../../../lib/click-outside'
+import { ProductCard2 } from '@components/product'
 
 interface Props {
   className?: string
@@ -20,6 +22,21 @@ const Searchbar: FC<Props> = ({ className, id = 'search' }) => {
   }, [])
 
   const [display, setDisplay] = useState(false)
+  const [displayQuickResults, setDisplayQuickResults] = useState(false)
+  const [currentQuery, setCurrentQuery] = useState('')
+  const searchFunction = useSearch({
+    search: currentQuery,
+  })
+
+  const quickSearch = (query) => {
+    console.log('quicksearch:')
+    console.log(query)
+    if (query.length > 0 && searchFunction.data?.found) {
+      setDisplayQuickResults(true)
+    } else {
+      setDisplayQuickResults(false)
+    }
+  }
 
   return (
     <div
@@ -32,7 +49,7 @@ const Searchbar: FC<Props> = ({ className, id = 'search' }) => {
         className={s.icon_container__small}
         onClick={() => setDisplay(true)}
       >
-        <svg className={s.icon} fill="currentColor" viewBox="0 0 20 20">
+        <svg className={s.icon_small} fill="currentColor" viewBox="0 0 20 20">
           <path
             fillRule="evenodd"
             clipRule="evenodd"
@@ -40,19 +57,16 @@ const Searchbar: FC<Props> = ({ className, id = 'search' }) => {
           />
         </svg>
       </button>
-      {display ? (
-        <div className={s.root_bg}>
-          <ClickOutside active={display} onClick={() => setDisplay(false)}>
-            <div className={s.root_searchbar}>
-              <button
-                className={s.icon__cross}
-                onClick={() => setDisplay(false)}
-              >
-                <Cross />
-              </button>
-              <label className={s.label} htmlFor={id}>
-                Que cherchez-vous ?
-              </label>
+      <div className={`${s.root_bg} ${display ? s.active : s.inactive}`}>
+        <ClickOutside active={display} onClick={() => setDisplay(false)}>
+          <div className={s.root_searchbar}>
+            <button className={s.icon__cross} onClick={() => setDisplay(false)}>
+              <Cross />
+            </button>
+            <label className={s.label} htmlFor={id}>
+              Que cherchez-vous ?
+            </label>
+            <div className={s.input_container}>
               <input
                 id={id}
                 className={s.input}
@@ -60,9 +74,13 @@ const Searchbar: FC<Props> = ({ className, id = 'search' }) => {
                 defaultValue={router.query.q}
                 onKeyUp={(e) => {
                   e.preventDefault()
+                  const q = e.currentTarget.value
+                  setCurrentQuery(q)
+                  quickSearch(q)
 
                   if (e.key === 'Enter') {
-                    const q = e.currentTarget.value
+                    //const q = e.currentTarget.value
+                    //setCurrentQuery(q)
 
                     router.push(
                       {
@@ -72,6 +90,7 @@ const Searchbar: FC<Props> = ({ className, id = 'search' }) => {
                       undefined,
                       { shallow: true }
                     )
+                    setDisplay(false)
                   }
                 }}
               />
@@ -85,9 +104,30 @@ const Searchbar: FC<Props> = ({ className, id = 'search' }) => {
                 </svg>
               </div>
             </div>
-          </ClickOutside>
-        </div>
-      ) : null}
+            {displayQuickResults == true && (
+              <div className={s.quickResults}>
+                {searchFunction.data?.products.slice(0, 4).map((product, i) => (
+                  <ProductCard2
+                    key={product.id}
+                    link={'/product/' + product.slug}
+                    title={product.name}
+                    variant="details"
+                    imageSrc={product.images[0].url}
+                    imageSrc2={
+                      product.images.length > 1 ? product.images[1].url : ''
+                    }
+                    product={product}
+                    imgProps={{
+                      width: 206,
+                      height: 256,
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </ClickOutside>
+      </div>
     </div>
   )
 }

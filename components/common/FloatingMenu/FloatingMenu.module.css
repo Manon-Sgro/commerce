@@ -1,0 +1,12 @@
+.root{
+    width: 600px;
+    height: 500px;
+
+    position:absolute;
+    top:100%;
+    left:0;
+
+    padding:2rem;
+
+    background:#fff;
+}
