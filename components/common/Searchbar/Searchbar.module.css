@@ -171,3 +171,14 @@
 .hidden{
     display:none;
 }
+
+.quickResults{
+    margin-top:3rem;
+    height:250px;
+    width:100%;
+
+    display:flex;
+    justify-content:flex-start;
+    align-items:center;
+    flex-wrap:nowrap;
+}

@@ -46,6 +46,14 @@ export const productInfoFragment = /* GraphQL */ `
       entityId
     }
     description
+    relatedProducts {
+      edges {
+        node {
+          id
+          name
+        }
+      }
+    }
     prices {
       ...productPrices
     }

@@ -2,10 +2,12 @@ import { FC, useEffect, useMemo, useState } from 'react'
 import cn from 'classnames'
 import s from './Searchbar.module.css'
 import { useRouter } from 'next/router'
+import useSearch from '@framework/product/use-search'
 import { Cross } from '@components/icons'
 import { Button } from '../../ui'
 import Link from 'next/link'
 import ClickOutside from '../../../lib/click-outside'
+import { ProductCard2 } from '@components/product'
 
 interface Props {
   className?: string
@@ -20,10 +22,20 @@ const Searchbar: FC<Props> = ({ className, id = 'search' }) => {
   }, [])
 
   const [display, setDisplay] = useState(false)
+  const [displayQuickResults, setDisplayQuickResults] = useState(false)
   const [currentQuery, setCurrentQuery] = useState('')
+  const searchFunction = useSearch({
+    search: currentQuery,
+  })
 
-  const activeSearchbar = () => {
-    setDisplay(true)
+  const quickSearch = (query) => {
+    console.log('quicksearch:')
+    console.log(query)
+    if (query.length > 0 && searchFunction.data?.found) {
+      setDisplayQuickResults(true)
+    } else {
+      setDisplayQuickResults(false)
+    }
   }
 
   return (
@@ -62,10 +74,13 @@ const Searchbar: FC<Props> = ({ className, id = 'search' }) => {
                 defaultValue={router.query.q}
                 onKeyUp={(e) => {
                   e.preventDefault()
+                  const q = e.currentTarget.value
+                  setCurrentQuery(q)
+                  quickSearch(q)
 
                   if (e.key === 'Enter') {
-                    const q = e.currentTarget.value
-                    setCurrentQuery(q)
+                    //const q = e.currentTarget.value
+                    //setCurrentQuery(q)
 
                     router.push(
                       {
@@ -89,6 +104,27 @@ const Searchbar: FC<Props> = ({ className, id = 'search' }) => {
                 </svg>
               </div>
             </div>
+            {displayQuickResults == true && (
+              <div className={s.quickResults}>
+                {searchFunction.data?.products.slice(0, 4).map((product, i) => (
+                  <ProductCard2
+                    key={product.id}
+                    link={'/product/' + product.slug}
+                    title={product.name}
+                    variant="details"
+                    imageSrc={product.images[0].url}
+                    imageSrc2={
+                      product.images.length > 1 ? product.images[1].url : ''
+                    }
+                    product={product}
+                    imgProps={{
+                      width: 206,
+                      height: 256,
+                    }}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </ClickOutside>
       </div>

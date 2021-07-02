@@ -30,9 +30,6 @@ export const handler: SWRHook<
     if (Number.isInteger(brandId))
       url.searchParams.set('brand', String(brandId))
     if (sort) url.searchParams.set('sort', sort)
-    console.log('searchparams')
-    console.log(url.pathname)
-    console.log(url.search)
 
     return fetch({
       url: url.pathname + url.search,

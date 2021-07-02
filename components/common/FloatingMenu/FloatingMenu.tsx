@@ -11,7 +11,7 @@ interface Props {
 }
 
 const FloatingMenu: FC<Props> = ({ className, id = 'search' }) => {
-  return <div className={`${className} ${s.root}`}>Hello!</div>
+  return <div className={`${className} ${s.root}`}>Dropdown</div>
 }
 
 export default FloatingMenu
