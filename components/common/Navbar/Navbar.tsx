@@ -6,10 +6,10 @@ import { Searchbar, UserNav, FloatingMenu } from '@components/common'
 import NavbarRoot from './NavbarRoot'
 import s from './Navbar.module.css'
 
-const openMenu = (e) => {
+const openMenu = (e: React.ChangeEvent<HTMLInputElement>) => {
   e.target.classList.add('hover')
 }
-const closeMenu = (e) => {
+const closeMenu = (e: React.ChangeEvent<HTMLInputElement>) => {
   e.target.classList.remove('hover')
 }
 
