@@ -1,0 +1,15 @@
+.section {
+  padding: 3rem 4rem 1rem 4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.section_title{
+    font-size:4rem;
+    font-weight: bold;
+    margin-bottom: .5rem;
+    max-width:45vw;
+    text-align:center;
+}

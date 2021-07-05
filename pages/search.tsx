@@ -4,8 +4,8 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 
-import { Layout } from '@components/common'
-import { ProductCard } from '@components/product'
+import { Layout, NavbarLinks, Title } from '@components/common'
+import { NavbarProducts, ProductCard } from '@components/product'
 import { Container, Grid, Skeleton } from '@components/ui'
 
 import { getConfig } from '@framework/api'
@@ -126,6 +126,42 @@ export default function Search({
 
   return (
     <Container>
+      {activeCategory && activeCategory.name.startsWith('#') && (
+        <Title title={`${activeCategory.name} trends`} />
+      )}
+      {activeCategory && !activeCategory.name.startsWith('#') && (
+        <Title title={activeCategory.name} />
+      )}
+      {!activeCategory && <Title title="Notre catalogue" />}
+      {!activeCategory && (
+        <NavbarLinks>
+          {categories.map((cat) => (
+            <li
+              key={cat.path}
+              className={cn(
+                'block text-sm leading-5 text-gray-700 hover:bg-gray-100 lg:hover:bg-transparent hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900'
+              )}
+            >
+              <Link
+                href={{
+                  pathname: getCategoryPath(cat.path, brand),
+                  query,
+                }}
+              >
+                <a
+                  onClick={(e) => handleClick(e, 'categories')}
+                  className={
+                    'block lg:inline-block px-4 py-2 lg:p-0 lg:my-2 lg:mx-4'
+                  }
+                >
+                  {cat.name}
+                </a>
+              </Link>
+            </li>
+          ))}
+        </NavbarLinks>
+      )}
+      <NavbarProducts />
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mt-3 mb-20">
         <div className="col-span-8 lg:col-span-2 order-1 lg:order-none">
           {/* Categories */}
