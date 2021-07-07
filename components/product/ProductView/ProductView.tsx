@@ -18,6 +18,7 @@ interface Props {
 }
 
 const ProductView: FC<Props> = ({ product }) => {
+  console.log(product)
   const addItem = useAddItem()
   const { price } = usePrice({
     amount: product.price.value,

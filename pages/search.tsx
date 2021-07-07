@@ -6,7 +6,9 @@ import { useRouter } from 'next/router'
 
 import { Layout, NavbarLinks, Title } from '@components/common'
 import { NavbarProducts, ProductCard } from '@components/product'
+import s from '@components/product/NavbarProducts/NavbarProducts.module.css'
 import { Container, Grid, Skeleton } from '@components/ui'
+import { ArrowDown } from '@components/icons'
 
 import { getConfig } from '@framework/api'
 import useSearch from '@framework/product/use-search'
@@ -38,10 +40,10 @@ const useStyles = makeStyles((theme) => ({
 
 // TODO (bc) : Remove or standarize this.
 const SORT = Object.entries({
-  'latest-desc': 'Latest arrivals',
-  'trending-desc': 'Trending',
-  'price-asc': 'Price: Low to high',
-  'price-desc': 'Price: High to low',
+  'latest-desc': 'les plus récents',
+  'trending-desc': 'tendances',
+  'price-asc': 'prix croissants',
+  'price-desc': 'prix décroissants',
 })
 
 import {
@@ -51,6 +53,7 @@ import {
   useSearchMeta,
 } from '@lib/search'
 import { Product } from '@commerce/types'
+import ClickOutside from '../lib/click-outside'
 
 export async function getStaticProps({
   preview,
@@ -100,7 +103,7 @@ export default function Search({
     (cat) => getSlug(cat.path) === category
   )
   console.log('activeCategory')
-  console.log(activeCategory?.name)
+  console.log(activeCategory)
   const activeBrand = brands.find(
     (b) => getSlug(b.node.path) === `brands/${brand}`
   )?.node
@@ -121,13 +124,28 @@ export default function Search({
     setActiveFilter(filter)
   }
 
+  const [displaySort, setDisplaySort] = useState(false)
+  const currentSelection = SORT.find((el) => el[0] == sort)
+  const [sortSelection, setSortSelection] = useState(
+    currentSelection ? currentSelection[1] : SORT[0][1]
+  )
+  const changeSortSelection = (event: any, el: string, filter: string) => {
+    setSortSelection(el)
+    setDisplaySort(false)
+    handleClick(event, 'sort')
+  }
+
   // Material-UI accordion
   const classes = useStyles()
 
   return (
     <Container>
       {activeCategory && activeCategory.name.startsWith('#') && (
-        <Title title={`${activeCategory.name} trends`} />
+        <Title
+          title={`${activeCategory.name}`}
+          subtitle={activeCategory.description}
+          bgImageUrl={activeCategory.image.url}
+        />
       )}
       {activeCategory && !activeCategory.name.startsWith('#') && (
         <Title title={activeCategory.name} />
@@ -161,7 +179,73 @@ export default function Search({
           ))}
         </NavbarLinks>
       )}
-      <NavbarProducts />
+      {/* NavbarProducts */}
+      <div className={s.section}>
+        <nav className={s.section_nav}>
+          <div className={s.section_nav_item__filters}>
+            <ArrowDown className={s.icon} width={15} height={15} />
+            Filter
+          </div>
+          {activeCategory ? (
+            <div className={s.section_nav_item__path}>
+              <Link href="/">
+                <a className={s.section_nav_item__path_link}>Accueil</a>
+              </Link>{' '}
+              /{' '}
+              <Link href="/search">
+                <a className={s.section_nav_item__path_link}>Catalogue</a>
+              </Link>{' '}
+              / <span>{activeCategory.name}</span>
+            </div>
+          ) : (
+            <div className={s.section_nav_item__path}>
+              <Link href="/">
+                <a className={s.section_nav_item__path_link}>Accueil</a>
+              </Link>{' '}
+              / <span>Catalogue</span>
+            </div>
+          )}
+          <ClickOutside
+            active={displaySort}
+            onClick={() => setDisplaySort(false)}
+          >
+            <div className={`${s.section_nav_item__sort_container}`}>
+              <button
+                className={`${s.section_nav_item__sort} ${s.section_nav_item_link}`}
+                onClick={() => setDisplaySort(!displaySort)}
+              >
+                Trier par : {sortSelection}
+                <ArrowDown className={s.icon} width={15} height={15} />
+              </button>
+              {displaySort && (
+                <div className={s.section_dropDown__sort}>
+                  <ul>
+                    {SORT.map(([key, text]) => (
+                      <li key={key}>
+                        <Link
+                          href={{
+                            pathname,
+                            query: filterQuery({ q, sort: key }),
+                          }}
+                        >
+                          <a
+                            onClick={(e) =>
+                              changeSortSelection(e, text, 'sort')
+                            }
+                            className={s.section_dropDown__sort_item}
+                          >
+                            Trier par : {text}
+                          </a>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </ClickOutside>
+        </nav>
+      </div>
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mt-3 mb-20">
         <div className="col-span-8 lg:col-span-2 order-1 lg:order-none">
           {/* Categories */}

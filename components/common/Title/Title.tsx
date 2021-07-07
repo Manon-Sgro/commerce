@@ -7,13 +7,37 @@ interface Props {
   className?: string
   id?: string
   title?: string
+  subtitle?: string
+  bgImageUrl?: Object
 }
 
-const Title: FC<Props> = ({ className, id, title }) => {
+const Title: FC<Props> = ({ className, id, title, subtitle, bgImageUrl }) => {
   return useMemo(
     () => (
       <div className={s.section}>
-        <h1 className={s.section_title}>{title}</h1>
+        <header className={bgImageUrl ? 'headerWithBg' : ''}>
+          <h1 className={s.section_title}>{title}</h1>
+          {subtitle ? (
+            <p
+              className={s.section_subtitle}
+              dangerouslySetInnerHTML={{ __html: subtitle }}
+            ></p>
+          ) : null}
+        </header>
+        <style jsx>{`
+          .headerWithBg {
+            background-image: url(${bgImageUrl});
+            background-position: center center;
+            background-size: cover;
+            color: #fff;
+            width: 100%;
+            height: 75vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+          }
+        `}</style>
       </div>
     ),
     []
