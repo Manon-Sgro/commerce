@@ -81,14 +81,10 @@ export default function Search({
   const router = useRouter()
   const { asPath } = router
   const { q, sort } = router.query
-  console.log('q')
-  console.log(q)
   // `q` can be included but because categories and designers can't be searched
   // in the same way of products, it's better to ignore the search input if one
   // of those is selected
   const query = filterQuery({ q, sort })
-  console.log('q2')
-  console.log(q)
 
   const { pathname, category, brand } = useSearchMeta(asPath)
   const flattenCategories = new Array()
@@ -214,7 +210,8 @@ export default function Search({
                 className={`${s.section_nav_item__sort} ${s.section_nav_item_link}`}
                 onClick={() => setDisplaySort(!displaySort)}
               >
-                Trier par : {sortSelection}
+                Trier par :{' '}
+                {currentSelection ? currentSelection[1] : SORT[0][1]}
                 <ArrowDown className={s.icon} width={15} height={15} />
               </button>
               {displaySort && (
