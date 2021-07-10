@@ -8,7 +8,7 @@ import { Layout, NavbarLinks, Title } from '@components/common'
 import { NavbarProducts, ProductCard } from '@components/product'
 import s from '@components/product/NavbarProducts/NavbarProducts.module.css'
 import { Container, Grid, Skeleton } from '@components/ui'
-import { ArrowDown } from '@components/icons'
+import { ArrowDown, Menu, Circle } from '@components/icons'
 
 import { getConfig } from '@framework/api'
 import useSearch from '@framework/product/use-search'
@@ -121,6 +121,7 @@ export default function Search({
   }
 
   const [displaySort, setDisplaySort] = useState(false)
+  const [displayFilters, setDisplayFilters] = useState(false)
   const currentSelection = SORT.find((el) => el[0] == sort)
   const [sortSelection, setSortSelection] = useState(
     currentSelection ? currentSelection[1] : SORT[0][1]
@@ -178,10 +179,76 @@ export default function Search({
       {/* NavbarProducts */}
       <div className={s.section}>
         <nav className={s.section_nav}>
-          <div className={s.section_nav_item__filters}>
-            <ArrowDown className={s.icon} width={15} height={15} />
-            Filter
-          </div>
+          {displayFilters && <div className={s.section_filters_bg}></div>}
+          <ClickOutside
+            active={displayFilters}
+            onClick={() => setDisplayFilters(false)}
+          >
+            <div>
+              <button
+                className={`${s.section_nav_item__filters} ${s.section_nav_item_link}`}
+                onClick={() => setDisplayFilters(!displayFilters)}
+              >
+                <Menu className={s.icon} width={15} height={15} />
+                Filtres
+              </button>
+              {displayFilters && (
+                <div className={s.section_filters}>
+                  <section className={s.section_filters_part}>
+                    <div className={s.section_filters_part_title}>
+                      Catégories de produits
+                    </div>
+                    <ul>
+                      {categories.map((cat) => (
+                        <li
+                          key={cat.path}
+                          className={`${s.section_filters_part_item} ${s.section_nav_item_link}`}
+                        >
+                          <Circle
+                            width={15}
+                            height={15}
+                            fillColor={
+                              activeCategory?.entityId === cat.entityId
+                                ? '#EC7A5C'
+                                : 'none'
+                            }
+                          />
+                          <Link
+                            href={{
+                              pathname: getCategoryPath(cat.path, brand),
+                              query,
+                            }}
+                          >
+                            <a
+                              onClick={(e) => handleClick(e, 'categories')}
+                              className={
+                                activeCategory?.entityId === cat.entityId
+                                  ? s.section_filters_part_item__bold
+                                  : ''
+                              }
+                            >
+                              {cat.name}
+                            </a>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                  <section className={s.section_filters_part}>
+                    <div className={s.section_filters_part_title}>
+                      Filtrer par prix
+                    </div>
+                  </section>
+                  <section className={s.section_filters_part}>
+                    <div className={s.section_filters_part_title}>
+                      Filtrer par saisons
+                    </div>
+                  </section>
+                </div>
+              )}
+            </div>
+          </ClickOutside>
+
           {activeCategory ? (
             <div className={s.section_nav_item__path}>
               <Link href="/">
