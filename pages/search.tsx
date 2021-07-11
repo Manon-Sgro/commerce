@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 
-import { Layout, NavbarLinks, Title } from '@components/common'
+import { DoubleSlider, Layout, NavbarLinks, Title } from '@components/common'
 import { NavbarProducts, ProductCard } from '@components/product'
 import s from '@components/product/NavbarProducts/NavbarProducts.module.css'
 import { Container, Grid, Skeleton } from '@components/ui'
@@ -54,6 +54,7 @@ import {
 } from '@lib/search'
 import { Product } from '@commerce/types'
 import ClickOutside from '../lib/click-outside'
+import MultiRangeSlider from '../components/common/MultiRangeSlider/MultiRangeSlider'
 
 export async function getStaticProps({
   preview,
@@ -238,6 +239,14 @@ export default function Search({
                     <div className={s.section_filters_part_title}>
                       Filtrer par prix
                     </div>
+                    <DoubleSlider
+                      min={0}
+                      max={1000}
+                      onChange={({ min, max }: { min: number; max: number }) =>
+                        console.log(`min = ${min}, max = ${max}`)
+                      }
+                    />
+                    <button className={s.section_nav_item_link}>Filtrer</button>
                   </section>
                   <section className={s.section_filters_part}>
                     <div className={s.section_filters_part_title}>
