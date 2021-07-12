@@ -54,7 +54,6 @@ import {
 } from '@lib/search'
 import { Product } from '@commerce/types'
 import ClickOutside from '../lib/click-outside'
-import MultiRangeSlider from '../components/common/MultiRangeSlider/MultiRangeSlider'
 
 export async function getStaticProps({
   preview,

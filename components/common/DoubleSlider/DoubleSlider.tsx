@@ -8,13 +8,13 @@ import React, {
 } from 'react'
 import s from './DoubleSlider.module.css'
 
-interface MultiRangeSliderProps {
+interface DoubleSliderProps {
   min: number
   max: number
   onChange: Function
 }
 
-const DoubleSlider: FC<MultiRangeSliderProps> = ({ min, max, onChange }) => {
+const DoubleSlider: FC<DoubleSliderProps> = ({ min, max, onChange }) => {
   const [minVal, setMinVal] = useState(min)
   const [maxVal, setMaxVal] = useState(max)
   const minValRef = useRef(min)
