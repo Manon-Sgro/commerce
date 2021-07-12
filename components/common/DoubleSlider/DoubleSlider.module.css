@@ -1,4 +1,4 @@
-.section {
+.container {
   padding-bottom: 2rem;
 }
 
@@ -8,10 +8,16 @@
 }
 
 .slider__track,
+.slider__range,
+.slider__left__value,
+.slider__right__value {
+  position: absolute;
+}
+
+.slider__track,
 .slider__range {
   border-radius: 3px;
   height: 5px;
-  position: absolute;
 }
 
 .slider__track {
@@ -23,6 +29,21 @@
 .slider__range {
   background-color: #9fe5e1;
   z-index: 2;
+}
+
+.slider__left__value,
+.slider__right__value {
+  color: #dee2e6;
+  font-size: 12px;
+  margin-top: 20px;
+}
+
+.slider__left__value {
+  left: 6px;
+}
+
+.slider__right__value {
+  right: -4px;
 }
 
 /* Removing the default appearance */
@@ -75,21 +96,4 @@
   pointer-events: all;
   position: relative;
 }
-
-.slider__left__value,
-.slider__right__value {
-  color: #dee2e6;
-  font-size: 12px;
-  margin-top: 20px;
-  position: absolute;
-}
-
-.slider__left__value {
-  left: 6px;
-}
-
-.slider__right__value {
-  right: -4px;
-}
-
 
