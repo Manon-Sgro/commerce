@@ -30,7 +30,7 @@ export function useSearchMeta(asPath: string) {
       b = parts[4]
     }
 
-    setPathname(path + query)
+    setPathname(path) // + query ?
     if (c && c + (s ? '/' + s : '') !== category)
       setCategory(c + (s ? '/' + s : ''))
     if (c === undefined && c !== category) setCategory('')

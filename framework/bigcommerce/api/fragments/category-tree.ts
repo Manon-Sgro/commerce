@@ -5,5 +5,9 @@ export const categoryTreeItemFragment = /* GraphQL */ `
     path
     description
     productCount
+    image {
+      url(width: 1000)
+      altText
+    }
   }
 `

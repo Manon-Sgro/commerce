@@ -4,9 +4,11 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 
-import { Layout } from '@components/common'
-import { ProductCard } from '@components/product'
+import { DoubleSlider, Layout, NavbarLinks, Title } from '@components/common'
+import { NavbarProducts, ProductCard } from '@components/product'
+import s from '@components/product/NavbarProducts/NavbarProducts.module.css'
 import { Container, Grid, Skeleton } from '@components/ui'
+import { ArrowDown, Menu, Circle } from '@components/icons'
 
 import { getConfig } from '@framework/api'
 import useSearch from '@framework/product/use-search'
@@ -38,10 +40,10 @@ const useStyles = makeStyles((theme) => ({
 
 // TODO (bc) : Remove or standarize this.
 const SORT = Object.entries({
-  'latest-desc': 'Latest arrivals',
-  'trending-desc': 'Trending',
-  'price-asc': 'Price: Low to high',
-  'price-desc': 'Price: High to low',
+  'latest-desc': 'les plus récents',
+  'trending-desc': 'tendances',
+  'price-asc': 'prix croissants',
+  'price-desc': 'prix décroissants',
 })
 
 import {
@@ -51,6 +53,7 @@ import {
   useSearchMeta,
 } from '@lib/search'
 import { Product } from '@commerce/types'
+import ClickOutside from '../lib/click-outside'
 
 export async function getStaticProps({
   preview,
@@ -78,14 +81,10 @@ export default function Search({
   const router = useRouter()
   const { asPath } = router
   const { q, sort } = router.query
-  console.log('q')
-  console.log(q)
   // `q` can be included but because categories and designers can't be searched
   // in the same way of products, it's better to ignore the search input if one
   // of those is selected
   const query = filterQuery({ q, sort })
-  console.log('q2')
-  console.log(q)
 
   const { pathname, category, brand } = useSearchMeta(asPath)
   const flattenCategories = new Array()
@@ -100,7 +99,7 @@ export default function Search({
     (cat) => getSlug(cat.path) === category
   )
   console.log('activeCategory')
-  console.log(activeCategory?.name)
+  console.log(activeCategory)
   const activeBrand = brands.find(
     (b) => getSlug(b.node.path) === `brands/${brand}`
   )?.node
@@ -121,11 +120,204 @@ export default function Search({
     setActiveFilter(filter)
   }
 
+  const [displaySort, setDisplaySort] = useState(false)
+  const [displayFilters, setDisplayFilters] = useState(false)
+  const currentSelection = SORT.find((el) => el[0] == sort)
+  const [sortSelection, setSortSelection] = useState(
+    currentSelection ? currentSelection[1] : SORT[0][1]
+  )
+  const changeSortSelection = (event: any, el: string, filter: string) => {
+    setSortSelection(el)
+    setDisplaySort(false)
+    handleClick(event, 'sort')
+  }
+
   // Material-UI accordion
   const classes = useStyles()
 
   return (
     <Container>
+      {activeCategory && activeCategory.name.startsWith('#') && (
+        <Title
+          title={`${activeCategory.name}`}
+          subtitle={activeCategory.description}
+          bgImageUrl={activeCategory.image.url}
+        />
+      )}
+      {activeCategory && !activeCategory.name.startsWith('#') && (
+        <Title title={activeCategory.name} />
+      )}
+      {!activeCategory && <Title title="Notre catalogue" />}
+      {!activeCategory && (
+        <NavbarLinks>
+          {categories.map((cat) => (
+            <li
+              key={cat.path}
+              className={cn(
+                'block text-sm leading-5 text-gray-700 hover:bg-gray-100 lg:hover:bg-transparent hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900'
+              )}
+            >
+              <Link
+                href={{
+                  pathname: getCategoryPath(cat.path, brand),
+                  query,
+                }}
+              >
+                <a
+                  onClick={(e) => handleClick(e, 'categories')}
+                  className={
+                    'block lg:inline-block px-4 py-2 lg:p-0 lg:my-2 lg:mx-4'
+                  }
+                >
+                  {cat.name}
+                </a>
+              </Link>
+            </li>
+          ))}
+        </NavbarLinks>
+      )}
+      {/* NavbarProducts */}
+      <div className={s.section}>
+        <nav className={s.section_nav}>
+          {displayFilters && <div className={s.section_filters_bg}></div>}
+          <ClickOutside
+            active={displayFilters}
+            onClick={() => setDisplayFilters(false)}
+          >
+            <div>
+              <button
+                className={`${s.section_nav_item__filters} ${s.section_nav_item_link}`}
+                onClick={() => setDisplayFilters(!displayFilters)}
+              >
+                <Menu className={s.icon} width={15} height={15} />
+                Filtres
+              </button>
+              {displayFilters && (
+                <div className={s.section_filters}>
+                  <section className={s.section_filters_part}>
+                    <div className={s.section_filters_part_title}>
+                      Catégories de produits
+                    </div>
+                    <ul>
+                      {categories.map((cat) => (
+                        <li
+                          key={cat.path}
+                          className={`${s.section_filters_part_item} ${s.section_nav_item_link}`}
+                        >
+                          <Circle
+                            width={15}
+                            height={15}
+                            fillColor={
+                              activeCategory?.entityId === cat.entityId
+                                ? '#EC7A5C'
+                                : 'none'
+                            }
+                          />
+                          <Link
+                            href={{
+                              pathname: getCategoryPath(cat.path, brand),
+                              query,
+                            }}
+                          >
+                            <a
+                              onClick={(e) => handleClick(e, 'categories')}
+                              className={
+                                activeCategory?.entityId === cat.entityId
+                                  ? s.section_filters_part_item__bold
+                                  : ''
+                              }
+                            >
+                              {cat.name}
+                            </a>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                  <section className={s.section_filters_part}>
+                    <div className={s.section_filters_part_title}>
+                      Filtrer par prix
+                    </div>
+                    <DoubleSlider
+                      min={0}
+                      max={1000}
+                      onChange={({ min, max }: { min: number; max: number }) =>
+                        console.log(`min = ${min}, max = ${max}`)
+                      }
+                    />
+                    <button className={s.section_nav_item_link}>Filtrer</button>
+                  </section>
+                  <section className={s.section_filters_part}>
+                    <div className={s.section_filters_part_title}>
+                      Filtrer par saisons
+                    </div>
+                  </section>
+                </div>
+              )}
+            </div>
+          </ClickOutside>
+
+          {activeCategory ? (
+            <div className={s.section_nav_item__path}>
+              <Link href="/">
+                <a className={s.section_nav_item__path_link}>Accueil</a>
+              </Link>{' '}
+              /{' '}
+              <Link href="/search">
+                <a className={s.section_nav_item__path_link}>Catalogue</a>
+              </Link>{' '}
+              / <span>{activeCategory.name}</span>
+            </div>
+          ) : (
+            <div className={s.section_nav_item__path}>
+              <Link href="/">
+                <a className={s.section_nav_item__path_link}>Accueil</a>
+              </Link>{' '}
+              / <span>Catalogue</span>
+            </div>
+          )}
+          <ClickOutside
+            active={displaySort}
+            onClick={() => setDisplaySort(false)}
+          >
+            <div className={`${s.section_nav_item__sort_container}`}>
+              <button
+                className={`${s.section_nav_item__sort} ${s.section_nav_item_link}`}
+                onClick={() => setDisplaySort(!displaySort)}
+              >
+                Trier par :{' '}
+                {currentSelection ? currentSelection[1] : SORT[0][1]}
+                <ArrowDown className={s.icon} width={15} height={15} />
+              </button>
+              {displaySort && (
+                <div className={s.section_dropDown__sort}>
+                  <ul>
+                    {SORT.map(([key, text]) => (
+                      <li key={key}>
+                        <Link
+                          href={{
+                            pathname,
+                            query: filterQuery({ q, sort: key }),
+                          }}
+                        >
+                          <a
+                            onClick={(e) =>
+                              changeSortSelection(e, text, 'sort')
+                            }
+                            className={s.section_dropDown__sort_item}
+                          >
+                            Trier par : {text}
+                          </a>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </ClickOutside>
+        </nav>
+      </div>
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mt-3 mb-20">
         <div className="col-span-8 lg:col-span-2 order-1 lg:order-none">
           {/* Categories */}
