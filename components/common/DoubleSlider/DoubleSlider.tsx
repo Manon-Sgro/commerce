@@ -12,9 +12,15 @@ interface DoubleSliderProps {
   min: number
   max: number
   onChange: Function
+  withCounters?: Boolean
 }
 
-const DoubleSlider: FC<DoubleSliderProps> = ({ min, max, onChange }) => {
+const DoubleSlider: FC<DoubleSliderProps> = ({
+  min,
+  max,
+  onChange,
+  withCounters = false,
+}) => {
   const [minVal, setMinVal] = useState(min)
   const [maxVal, setMaxVal] = useState(max)
   const minValRef = useRef(min)
@@ -82,9 +88,13 @@ const DoubleSlider: FC<DoubleSliderProps> = ({ min, max, onChange }) => {
 
       <div className={s.slider}>
         <div className={s.slider__track}></div>
-        <div ref={range} className={s.slider_range}></div>
-        <div className={s.slider__left__value}>{minVal}</div>
-        <div className={s.slider__right__value}>{maxVal}</div>
+        <div ref={range} className={s.slider__range}></div>
+        {withCounters && (
+          <>
+            <div className={s.slider__left__value}>{minVal}</div>
+            <div className={s.slider__right__value}>{maxVal}</div>
+          </>
+        )}
       </div>
     </div>
   )

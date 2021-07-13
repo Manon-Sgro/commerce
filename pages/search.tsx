@@ -132,6 +132,9 @@ export default function Search({
     handleClick(event, 'sort')
   }
 
+  const [minPrice, setMinPrice] = useState(0)
+  const [maxPrice, setMaxPrice] = useState(1000)
+
   // Material-UI accordion
   const classes = useStyles()
 
@@ -241,11 +244,25 @@ export default function Search({
                     <DoubleSlider
                       min={0}
                       max={1000}
-                      onChange={({ min, max }: { min: number; max: number }) =>
-                        console.log(`min = ${min}, max = ${max}`)
-                      }
+                      onChange={({
+                        min,
+                        max,
+                      }: {
+                        min: number
+                        max: number
+                      }) => {
+                        setMinPrice(min)
+                        setMaxPrice(max)
+                      }}
                     />
-                    <button className={s.section_nav_item_link}>Filtrer</button>
+                    <div className={s.section_filters_price_actions}>
+                      <div className={s.section_filters_price_actions_infos}>
+                        Prix: {minPrice}€ — {maxPrice}€
+                      </div>
+                      <button className={s.section_filters_price_actions_btn}>
+                        Filtrer
+                      </button>
+                    </div>
                   </section>
                   <section className={s.section_filters_part}>
                     <div className={s.section_filters_part_title}>
