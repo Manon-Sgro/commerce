@@ -132,8 +132,11 @@ export default function Search({
     handleClick(event, 'sort')
   }
 
+  const [maxProductPrice, setMaxProductPrice] = useState(1000)
   const [minPrice, setMinPrice] = useState(0)
-  const [maxPrice, setMaxPrice] = useState(1000)
+  const [maxPrice, setMaxPrice] = useState(maxProductPrice)
+  const [minPriceFilter, setMinPriceFilter] = useState(0)
+  const [maxPriceFilter, setMaxPriceFilter] = useState(maxProductPrice)
 
   const [activeFilters, setActiveFilters] = useState<
     { name: string; value: string }[]
@@ -315,6 +318,8 @@ export default function Search({
                         onClick={() => {
                           addActiveFilter('Min', minPrice.toString() + '€')
                           addActiveFilter('Max', maxPrice.toString() + '€')
+                          setMinPriceFilter(minPrice)
+                          setMaxPriceFilter(maxPrice)
                         }}
                       >
                         Filtrer
@@ -671,7 +676,15 @@ export default function Search({
                       hidden: !data.found,
                     })}
                   >
-                    Showing {data.products.length} results{' '}
+                    Showing{' '}
+                    {
+                      data.products.filter(
+                        (el) =>
+                          el.price.value >= minPriceFilter &&
+                          el.price.value <= maxPriceFilter
+                      ).length
+                    }{' '}
+                    results{' '}
                     {q && (
                       <>
                         for "<strong>{q}</strong>"
@@ -708,18 +721,24 @@ export default function Search({
 
           {data ? (
             <Grid layout="normal">
-              {data.products.map((product: Product) => (
-                <ProductCard
-                  variant="simple"
-                  key={product.path}
-                  className="animated fadeIn"
-                  product={product}
-                  imgProps={{
-                    width: 480,
-                    height: 480,
-                  }}
-                />
-              ))}
+              {data.products
+                .filter(
+                  (el) =>
+                    el.price.value >= minPriceFilter &&
+                    el.price.value <= maxPriceFilter
+                )
+                .map((product: Product) => (
+                  <ProductCard
+                    variant="simple"
+                    key={product.path}
+                    className="animated fadeIn"
+                    product={product}
+                    imgProps={{
+                      width: 480,
+                      height: 480,
+                    }}
+                  />
+                ))}
             </Grid>
           ) : (
             <Grid layout="normal">
