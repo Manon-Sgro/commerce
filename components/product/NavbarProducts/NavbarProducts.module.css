@@ -96,13 +96,13 @@
   top:0;
   left:0;
   width: 25vw;
-  min-height:100vh;
+  max-height:100vh;
 
   z-index:999;
 
   background-color: #fff;
 
-  overflow-y:auto;
+  overflow-y: auto;
 }
 
 .section_filters_bg {
@@ -124,7 +124,7 @@
   font-size: .9rem;
   font-weight: 700;
   text-transform: uppercase;
-  margin-bottom:1rem;
+  margin-bottom:2rem;
 }
 
 .section_filters_part_item {
@@ -162,3 +162,28 @@
     color: #000;
     transition: all .2s;
   }
+
+.section_filters_item {
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  font-size:.9rem;
+  grid-gap:.5rem;
+}
+.section_filters_btn {
+  display: flex;
+  align-items: center;
+  grid-gap: .5rem;
+}
+.section_filters_btn_name{
+    font-weight:bold;
+}
+.section_filters_btn_cross {
+  padding: 2px;
+  background: #ec7a5c;
+  border-radius: 2px;
+  color: #fff;
+}
+.section_filters_value {
+  color: #a1a1a1;
+}

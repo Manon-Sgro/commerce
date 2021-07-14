@@ -8,7 +8,7 @@ import { DoubleSlider, Layout, NavbarLinks, Title } from '@components/common'
 import { NavbarProducts, ProductCard } from '@components/product'
 import s from '@components/product/NavbarProducts/NavbarProducts.module.css'
 import { Container, Grid, Skeleton } from '@components/ui'
-import { ArrowDown, Menu, Circle } from '@components/icons'
+import { ArrowDown, Menu, Circle, Cross } from '@components/icons'
 
 import { getConfig } from '@framework/api'
 import useSearch from '@framework/product/use-search'
@@ -135,6 +135,23 @@ export default function Search({
   const [minPrice, setMinPrice] = useState(0)
   const [maxPrice, setMaxPrice] = useState(1000)
 
+  const [activeFilters, setActiveFilters] = useState<
+    { name: string; value: string }[]
+  >([])
+  // handle click event of the button to add item
+  const addActiveFilter = (name: string, value: string) => {
+    setActiveFilters((prevItems) => [
+      ...prevItems.filter((el) => el.name !== name),
+      {
+        name: name,
+        value: value,
+      },
+    ])
+  }
+  const removeActiveFilter = (name: string) => {
+    setActiveFilters(activeFilters.filter((el) => el.name !== name))
+  }
+
   // Material-UI accordion
   const classes = useStyles()
 
@@ -197,6 +214,40 @@ export default function Search({
               </button>
               {displayFilters && (
                 <div className={s.section_filters}>
+                  {activeFilters.length > 0 && (
+                    <section className={s.section_filters_part}>
+                      <div className={s.section_filters_part_title}>
+                        Filtres actifs
+                      </div>
+                      <ul>
+                        {activeFilters.map((filter) => (
+                          <li
+                            key={filter.name}
+                            className={`${s.section_filters_item}`}
+                          >
+                            <button
+                              className={`${s.section_nav_item_link} ${s.section_filters_btn}`}
+                              onClick={() => removeActiveFilter(filter.name)}
+                            >
+                              <div className={`${s.section_filters_btn_cross}`}>
+                                <Cross
+                                  width={12}
+                                  height={12}
+                                  stroke-width={4}
+                                />
+                              </div>
+                              <div className={`${s.section_filters_btn_name}`}>
+                                {filter.name}
+                              </div>
+                            </button>
+                            <div className={`${s.section_filters_value}`}>
+                              {filter.value}
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </section>
+                  )}
                   <section className={s.section_filters_part}>
                     <div className={s.section_filters_part_title}>
                       Catégories de produits
@@ -259,7 +310,13 @@ export default function Search({
                       <div className={s.section_filters_price_actions_infos}>
                         Prix: {minPrice}€ — {maxPrice}€
                       </div>
-                      <button className={s.section_filters_price_actions_btn}>
+                      <button
+                        className={s.section_filters_price_actions_btn}
+                        onClick={() => {
+                          addActiveFilter('Min', minPrice.toString() + '€')
+                          addActiveFilter('Max', maxPrice.toString() + '€')
+                        }}
+                      >
                         Filtrer
                       </button>
                     </div>

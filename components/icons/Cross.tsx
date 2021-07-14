@@ -1,9 +1,17 @@
-const Cross = ({ ...props }) => {
+import { FC } from 'react'
+
+interface Props {
+  className?: string
+  width?: number
+  height?: number
+}
+
+const Cross: FC<Props> = ({ width = 24, height = 24, ...props }) => {
   return (
     <svg
       viewBox="0 0 24 24"
-      width="24"
-      height="24"
+      width={width}
+      height={height}
       stroke="currentColor"
       strokeWidth="1.5"
       strokeLinecap="round"
