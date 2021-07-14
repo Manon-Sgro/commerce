@@ -132,7 +132,17 @@ export default function Search({
     handleClick(event, 'sort')
   }
 
-  const [maxProductPrice, setMaxProductPrice] = useState(1000)
+  const minProductPrice = 0
+  const [maxProductPrice] = useState(
+    data
+      ? data.products
+          .map((el) => el.price.value)
+          .reduce((max, currPrice) =>
+            currPrice > max ? Math.floor(currPrice) + 1 : max
+          )
+      : 1000
+  )
+  //const [maxProductPrice] = useState(50);
   const [minPrice, setMinPrice] = useState(0)
   const [maxPrice, setMaxPrice] = useState(maxProductPrice)
   const [minPriceFilter, setMinPriceFilter] = useState(0)
@@ -152,6 +162,15 @@ export default function Search({
     ])
   }
   const removeActiveFilter = (name: string) => {
+    // reset filters
+    if (name === 'Min') {
+      setMinPriceFilter(minProductPrice)
+    }
+    if (name === 'Max') {
+      setMaxPriceFilter(maxProductPrice)
+    }
+
+    // remove filter from list
     setActiveFilters(activeFilters.filter((el) => el.name !== name))
   }
 
@@ -296,8 +315,8 @@ export default function Search({
                       Filtrer par prix
                     </div>
                     <DoubleSlider
-                      min={0}
-                      max={1000}
+                      min={minProductPrice}
+                      max={maxProductPrice}
                       onChange={({
                         min,
                         max,
