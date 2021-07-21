@@ -1,7 +1,7 @@
 import cn from 'classnames'
 import type { GetStaticPropsContext, InferGetStaticPropsType } from 'next'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 
 import { DoubleSlider, Layout, NavbarLinks, Title } from '@components/common'
@@ -55,6 +55,10 @@ import {
 import { Product } from '@commerce/types'
 import ClickOutside from '../lib/click-outside'
 
+interface GetFilters {
+  data: any[]
+}
+
 export async function getStaticProps({
   preview,
   locale,
@@ -62,11 +66,15 @@ export async function getStaticProps({
   const config = getConfig({ locale })
   const { pages } = await getAllPages({ config, preview })
   const { categories, brands } = await getSiteInfo({ config, preview })
+  const allFilters = await config.storeApiFetch<GetFilters>(
+    `/v3/settings/search/filters`
+  )
   return {
     props: {
       pages,
       categories,
       brands,
+      allFilters,
     },
   }
 }
@@ -74,6 +82,7 @@ export async function getStaticProps({
 export default function Search({
   categories,
   brands,
+  allFilters,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   const [activeFilter, setActiveFilter] = useState('')
   const [toggleFilter, setToggleFilter] = useState(false)
@@ -110,6 +119,46 @@ export default function Search({
     brandId: activeBrand?.entityId,
     sort: typeof sort === 'string' ? sort : '',
   })
+
+  const enabledFilters = allFilters?.data
+    .filter((el) => el.is_enabled)
+    .map((el) => {
+      return {
+        display_name: el.display_name.split(':')[0],
+        values:
+          el.display_name.split(':').length > 1
+            ? el.display_name.split(':')[1].split('-')
+            : null,
+        selected: false,
+      }
+    })
+  // const enabledFiltersNames = enabledFilters.map((el) => el.display_name.toLowerCase())
+  //const [additionnalFilters, setAdditionnalFilters] = useState<{ display_name: string, values: string[] }[]>([])
+  console.log('filters')
+  console.log(enabledFilters)
+  const SelectOption = (optionName: string) => {
+    const foundTrueOption = enabledFilters.find((el) => el.selected == true)
+    if (foundTrueOption) {
+      foundTrueOption.selected = false
+    }
+    const foundOption = enabledFilters.find(
+      (el) => el.display_name == optionName
+    )
+    if (foundOption) {
+      foundOption.selected = true
+    }
+  }
+  /*
+  const addFilterValues = (values: string, name: string) => {
+    setAdditionnalFilters((prevItems) => [
+      ...prevItems.filter((el) => el.display_name.toLowerCase() !== name),
+      {
+        display_name: name,
+        values: values.split('-'),
+      },
+    ])
+  }
+  */
 
   const handleClick = (event: any, filter: string) => {
     if (filter !== activeFilter) {
@@ -345,11 +394,27 @@ export default function Search({
                       </button>
                     </div>
                   </section>
-                  <section className={s.section_filters_part}>
-                    <div className={s.section_filters_part_title}>
-                      Filtrer par saisons
-                    </div>
-                  </section>
+                  {enabledFilters
+                    .filter((el) => el.values)
+                    .map((filter) => (
+                      <section
+                        key={filter.display_name}
+                        className={s.section_filters_part}
+                      >
+                        <div className={s.section_filters_part_title}>
+                          Filtrer par {filter.display_name}
+                        </div>
+                        <ul className={s.section_filters_part_options}>
+                          {filter.values.map((option: string) => (
+                            <li className={s.section_filters_part_options_item}>
+                              <button onClick={SelectOption(option)}>
+                                {option}
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      </section>
+                    ))}
                 </div>
               )}
             </div>
@@ -697,6 +762,7 @@ export default function Search({
                   >
                     Showing{' '}
                     {
+                      /* TODO : do it within the products request */
                       data.products.filter(
                         (el) =>
                           el.price.value >= minPriceFilter &&
@@ -740,24 +806,36 @@ export default function Search({
 
           {data ? (
             <Grid layout="normal">
-              {data.products
-                .filter(
-                  (el) =>
-                    el.price.value >= minPriceFilter &&
-                    el.price.value <= maxPriceFilter
-                )
-                .map((product: Product) => (
-                  <ProductCard
-                    variant="simple"
-                    key={product.path}
-                    className="animated fadeIn"
-                    product={product}
-                    imgProps={{
-                      width: 480,
-                      height: 480,
-                    }}
-                  />
-                ))}
+              {
+                /* TODO : do it within the products request */
+                data.products
+                  .filter(
+                    (el) =>
+                      el.price.value >= minPriceFilter &&
+                      el.price.value <= maxPriceFilter
+                  )
+                  .map((product: Product) => {
+                    /*
+                    product.customFields.edges.forEach((el: any) => {
+                      if (enabledFiltersNames.includes(el.node.name.toLowerCase())) {
+                        addFilterValues(el.node.value, el.node.name.toLowerCase());
+                      }
+                    });
+                    */
+                    return (
+                      <ProductCard
+                        variant="simple"
+                        key={product.path}
+                        className="animated fadeIn"
+                        product={product}
+                        imgProps={{
+                          width: 480,
+                          height: 480,
+                        }}
+                      />
+                    )
+                  })
+              }
             </Grid>
           ) : (
             <Grid layout="normal">

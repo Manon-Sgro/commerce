@@ -46,6 +46,14 @@ export const productInfoFragment = /* GraphQL */ `
       entityId
     }
     description
+    customFields {
+      edges {
+        node {
+          name
+          value
+        }
+      }
+    }
     relatedProducts {
       edges {
         node {
