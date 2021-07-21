@@ -4,8 +4,14 @@ import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 
-import { DoubleSlider, Layout, NavbarLinks, Title } from '@components/common'
-import { NavbarProducts, ProductCard } from '@components/product'
+import {
+  DoubleSlider,
+  Layout,
+  NavbarLinks,
+  Title,
+  TopButton,
+} from '@components/common'
+import { NavbarProducts, ProductCard2 } from '@components/product'
 import s from '@components/product/NavbarProducts/NavbarProducts.module.css'
 import { Container, Grid, Skeleton } from '@components/ui'
 import { ArrowDown, Menu, Circle, Cross } from '@components/icons'
@@ -66,15 +72,11 @@ export async function getStaticProps({
   const config = getConfig({ locale })
   const { pages } = await getAllPages({ config, preview })
   const { categories, brands } = await getSiteInfo({ config, preview })
-  const allFilters = await config.storeApiFetch<GetFilters>(
-    `/v3/settings/search/filters`
-  )
   return {
     props: {
       pages,
       categories,
       brands,
-      allFilters,
     },
   }
 }
@@ -82,7 +84,6 @@ export async function getStaticProps({
 export default function Search({
   categories,
   brands,
-  allFilters,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   const [activeFilter, setActiveFilter] = useState('')
   const [toggleFilter, setToggleFilter] = useState(false)
@@ -120,46 +121,6 @@ export default function Search({
     sort: typeof sort === 'string' ? sort : '',
   })
 
-  const enabledFilters = allFilters?.data
-    .filter((el) => el.is_enabled)
-    .map((el) => {
-      return {
-        display_name: el.display_name.split(':')[0],
-        values:
-          el.display_name.split(':').length > 1
-            ? el.display_name.split(':')[1].split('-')
-            : null,
-        selected: false,
-      }
-    })
-  // const enabledFiltersNames = enabledFilters.map((el) => el.display_name.toLowerCase())
-  //const [additionnalFilters, setAdditionnalFilters] = useState<{ display_name: string, values: string[] }[]>([])
-  console.log('filters')
-  console.log(enabledFilters)
-  const SelectOption = (optionName: string) => {
-    const foundTrueOption = enabledFilters.find((el) => el.selected == true)
-    if (foundTrueOption) {
-      foundTrueOption.selected = false
-    }
-    const foundOption = enabledFilters.find(
-      (el) => el.display_name == optionName
-    )
-    if (foundOption) {
-      foundOption.selected = true
-    }
-  }
-  /*
-  const addFilterValues = (values: string, name: string) => {
-    setAdditionnalFilters((prevItems) => [
-      ...prevItems.filter((el) => el.display_name.toLowerCase() !== name),
-      {
-        display_name: name,
-        values: values.split('-'),
-      },
-    ])
-  }
-  */
-
   const handleClick = (event: any, filter: string) => {
     if (filter !== activeFilter) {
       setToggleFilter(true)
@@ -196,6 +157,15 @@ export default function Search({
   const [maxPrice, setMaxPrice] = useState(maxProductPrice)
   const [minPriceFilter, setMinPriceFilter] = useState(0)
   const [maxPriceFilter, setMaxPriceFilter] = useState(maxProductPrice)
+  let subcategories = []
+  /*
+  const addSubcategory = (name: string) => {
+    setSubcategories((prevItems) => [
+      ...prevItems.filter((el) => el !== name),
+      name
+    ])
+  }
+  */
 
   const [activeFilters, setActiveFilters] = useState<
     { name: string; value: string }[]
@@ -241,30 +211,32 @@ export default function Search({
       {!activeCategory && <Title title="Notre catalogue" />}
       {!activeCategory && (
         <NavbarLinks>
-          {categories.map((cat) => (
-            <li
-              key={cat.path}
-              className={cn(
-                'block text-sm leading-5 text-gray-700 hover:bg-gray-100 lg:hover:bg-transparent hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900'
-              )}
-            >
-              <Link
-                href={{
-                  pathname: getCategoryPath(cat.path, brand),
-                  query,
-                }}
+          {categories
+            .filter((el) => el.children.length == 0)
+            .map((cat) => (
+              <li
+                key={cat.path}
+                className={cn(
+                  'block text-sm leading-5 text-gray-700 hover:bg-gray-100 lg:hover:bg-transparent hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900'
+                )}
               >
-                <a
-                  onClick={(e) => handleClick(e, 'categories')}
-                  className={
-                    'block lg:inline-block px-4 py-2 lg:p-0 lg:my-2 lg:mx-4'
-                  }
+                <Link
+                  href={{
+                    pathname: getCategoryPath(cat.path, brand),
+                    query,
+                  }}
                 >
-                  {cat.name}
-                </a>
-              </Link>
-            </li>
-          ))}
+                  <a
+                    onClick={(e) => handleClick(e, 'categories')}
+                    className={
+                      'block lg:inline-block px-4 py-2 lg:p-0 lg:my-2 lg:mx-4'
+                    }
+                  >
+                    {cat.name}
+                  </a>
+                </Link>
+              </li>
+            ))}
         </NavbarLinks>
       )}
       {/* NavbarProducts */}
@@ -324,39 +296,41 @@ export default function Search({
                       Catégories de produits
                     </div>
                     <ul>
-                      {categories.map((cat) => (
-                        <li
-                          key={cat.path}
-                          className={`${s.section_filters_part_item} ${s.section_nav_item_link}`}
-                        >
-                          <Circle
-                            width={15}
-                            height={15}
-                            fillColor={
-                              activeCategory?.entityId === cat.entityId
-                                ? '#EC7A5C'
-                                : 'none'
-                            }
-                          />
-                          <Link
-                            href={{
-                              pathname: getCategoryPath(cat.path, brand),
-                              query,
-                            }}
+                      {categories
+                        .filter((el) => el.children.length == 0)
+                        .map((cat) => (
+                          <li
+                            key={cat.path}
+                            className={`${s.section_filters_part_item} ${s.section_nav_item_link}`}
                           >
-                            <a
-                              onClick={(e) => handleClick(e, 'categories')}
-                              className={
+                            <Circle
+                              width={15}
+                              height={15}
+                              fillColor={
                                 activeCategory?.entityId === cat.entityId
-                                  ? s.section_filters_part_item__bold
-                                  : ''
+                                  ? '#EC7A5C'
+                                  : 'none'
                               }
+                            />
+                            <Link
+                              href={{
+                                pathname: getCategoryPath(cat.path, brand),
+                                query,
+                              }}
                             >
-                              {cat.name}
-                            </a>
-                          </Link>
-                        </li>
-                      ))}
+                              <a
+                                onClick={(e) => handleClick(e, 'categories')}
+                                className={
+                                  activeCategory?.entityId === cat.entityId
+                                    ? s.section_filters_part_item__bold
+                                    : ''
+                                }
+                              >
+                                {cat.name}
+                              </a>
+                            </Link>
+                          </li>
+                        ))}
                     </ul>
                   </section>
                   <section className={s.section_filters_part}>
@@ -394,27 +368,35 @@ export default function Search({
                       </button>
                     </div>
                   </section>
-                  {enabledFilters
-                    .filter((el) => el.values)
-                    .map((filter) => (
-                      <section
-                        key={filter.display_name}
-                        className={s.section_filters_part}
-                      >
-                        <div className={s.section_filters_part_title}>
-                          Filtrer par {filter.display_name}
-                        </div>
-                        <ul className={s.section_filters_part_options}>
-                          {filter.values.map((option: string) => (
-                            <li className={s.section_filters_part_options_item}>
-                              <button onClick={SelectOption(option)}>
-                                {option}
-                              </button>
-                            </li>
-                          ))}
-                        </ul>
-                      </section>
-                    ))}
+                  {categories.map((cat) => {
+                    if (cat.children.length > 0) {
+                      return (
+                        <section
+                          key={cat.name}
+                          className={s.section_filters_part}
+                        >
+                          <div className={s.section_filters_part_title}>
+                            Filtrer par {cat.name}
+                          </div>
+                          <ul className={s.section_filters_part_options}>
+                            {cat.children.map((subcat) => (
+                              <li
+                                className={s.section_filters_part_options_item}
+                              >
+                                <button
+                                  onClick={() => {
+                                    addActiveFilter(cat.name, subcat.name)
+                                  }}
+                                >
+                                  {subcat.name}
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                        </section>
+                      )
+                    }
+                  })}
                 </div>
               )}
             </div>
@@ -482,274 +464,8 @@ export default function Search({
         </nav>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mt-3 mb-20">
-        <div className="col-span-8 lg:col-span-2 order-1 lg:order-none">
-          {/* Categories */}
-          <div className="relative inline-block w-full">
-            <div className="lg:hidden">
-              <span className="rounded-md shadow-sm">
-                <button
-                  type="button"
-                  onClick={(e) => handleClick(e, 'categories')}
-                  className="flex justify-between w-full rounded-sm border border-gray-300 px-4 py-3 bg-white text-sm leading-5 font-medium text-gray-700 hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-normal active:bg-gray-50 active:text-gray-800 transition ease-in-out duration-150"
-                  id="options-menu"
-                  aria-haspopup="true"
-                  aria-expanded="true"
-                >
-                  {activeCategory?.name
-                    ? `Category: ${activeCategory?.name}`
-                    : 'All Categories'}
-                  <svg
-                    className="-mr-1 ml-2 h-5 w-5"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </button>
-              </span>
-            </div>
-            <div
-              className={`origin-top-left absolute lg:relative left-0 mt-2 w-full rounded-md shadow-lg lg:shadow-none z-10 mb-10 lg:block ${
-                activeFilter !== 'categories' || toggleFilter !== true
-                  ? 'hidden'
-                  : ''
-              }`}
-            >
-              <div className="rounded-sm bg-white shadow-xs lg:bg-none lg:shadow-none">
-                <div
-                  role="menu"
-                  aria-orientation="vertical"
-                  aria-labelledby="options-menu"
-                >
-                  <ul>
-                    <li
-                      className={cn(
-                        'block text-sm leading-5 text-gray-700 lg:text-base lg:no-underline lg:font-bold lg:tracking-wide hover:bg-gray-100 lg:hover:bg-transparent hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900',
-                        {
-                          underline: !activeCategory?.name,
-                        }
-                      )}
-                    >
-                      <Link
-                        href={{ pathname: getCategoryPath('', brand), query }}
-                      >
-                        <a
-                          onClick={(e) => handleClick(e, 'categories')}
-                          className={
-                            'block lg:inline-block px-4 py-2 lg:p-0 lg:my-2 lg:mx-4'
-                          }
-                        >
-                          All Categories
-                        </a>
-                      </Link>
-                    </li>
-                    {categories.map((cat) => (
-                      <li
-                        key={cat.path}
-                        className={cn(
-                          'block text-sm leading-5 text-gray-700 hover:bg-gray-100 lg:hover:bg-transparent hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900',
-                          {
-                            underline:
-                              activeCategory?.entityId === cat.entityId,
-                          }
-                        )}
-                      >
-                        {cat.children.length > 0 ? (
-                          <Accordion>
-                            <AccordionSummary
-                              expandIcon={<ExpandMoreIcon />}
-                              aria-controls="panel1a-content"
-                              id="panel1a-header"
-                            >
-                              <Link
-                                href={{
-                                  pathname: getCategoryPath(cat.path, brand),
-                                  query,
-                                }}
-                              >
-                                <a
-                                  onClick={(e) => handleClick(e, 'categories')}
-                                  className={
-                                    'block lg:inline-block px-4 py-2 lg:p-0 lg:my-2 lg:mx-4'
-                                  }
-                                >
-                                  {cat.name}
-                                </a>
-                              </Link>
-                            </AccordionSummary>
-                            <AccordionDetails>
-                              <ul>
-                                {cat.children.map((subcat) => (
-                                  <li
-                                    key={subcat.path}
-                                    className={cn(
-                                      'block text-sm leading-5 text-gray-700 hover:bg-gray-100 lg:hover:bg-transparent hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900',
-                                      {
-                                        underline:
-                                          activeCategory?.entityId ===
-                                          subcat.entityId,
-                                      }
-                                    )}
-                                  >
-                                    <Link
-                                      href={{
-                                        pathname: getCategoryPath(
-                                          subcat.path,
-                                          brand
-                                        ),
-                                        query,
-                                      }}
-                                    >
-                                      <a
-                                        onClick={(e) =>
-                                          handleClick(e, 'categories')
-                                        }
-                                        className={
-                                          'block lg:inline-block px-4 py-2 lg:p-0 lg:my-2 lg:mx-4'
-                                        }
-                                      >
-                                        {subcat.name}
-                                      </a>
-                                    </Link>
-                                  </li>
-                                ))}
-                              </ul>
-                            </AccordionDetails>
-                          </Accordion>
-                        ) : (
-                          <Link
-                            href={{
-                              pathname: getCategoryPath(cat.path, brand),
-                              query,
-                            }}
-                          >
-                            <a
-                              onClick={(e) => handleClick(e, 'categories')}
-                              className={
-                                'block lg:inline-block px-4 py-2 lg:p-0 lg:my-2 lg:mx-4'
-                              }
-                            >
-                              {cat.name}
-                            </a>
-                          </Link>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Designs */}
-          <div className="relative inline-block w-full">
-            <div className="lg:hidden mt-3">
-              <span className="rounded-md shadow-sm">
-                <button
-                  type="button"
-                  onClick={(e) => handleClick(e, 'brands')}
-                  className="flex justify-between w-full rounded-sm border border-gray-300 px-4 py-3 bg-white text-sm leading-5 font-medium text-gray-900 hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-normal active:bg-gray-50 active:text-gray-800 transition ease-in-out duration-150"
-                  id="options-menu"
-                  aria-haspopup="true"
-                  aria-expanded="true"
-                >
-                  {activeBrand?.name
-                    ? `Design: ${activeBrand?.name}`
-                    : 'All Designs'}
-                  <svg
-                    className="-mr-1 ml-2 h-5 w-5"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </button>
-              </span>
-            </div>
-            <div
-              className={`origin-top-left absolute lg:relative left-0 mt-2 w-full rounded-md shadow-lg lg:shadow-none z-10 mb-10 lg:block ${
-                activeFilter !== 'brands' || toggleFilter !== true
-                  ? 'hidden'
-                  : ''
-              }`}
-            >
-              <div className="rounded-sm bg-white shadow-xs lg:bg-none lg:shadow-none">
-                <div
-                  role="menu"
-                  aria-orientation="vertical"
-                  aria-labelledby="options-menu"
-                >
-                  <ul>
-                    <li
-                      className={cn(
-                        'block text-sm leading-5 text-gray-700 lg:text-base lg:no-underline lg:font-bold lg:tracking-wide hover:bg-gray-100 lg:hover:bg-transparent hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900',
-                        {
-                          underline: !activeBrand?.name,
-                        }
-                      )}
-                    >
-                      <Link
-                        href={{
-                          pathname: getDesignerPath('', category),
-                          query,
-                        }}
-                      >
-                        <a
-                          onClick={(e) => handleClick(e, 'brands')}
-                          className={
-                            'block lg:inline-block px-4 py-2 lg:p-0 lg:my-2 lg:mx-4'
-                          }
-                        >
-                          All Designers
-                        </a>
-                      </Link>
-                    </li>
-                    {brands.flatMap(({ node }) => (
-                      <li
-                        key={node.path}
-                        className={cn(
-                          'block text-sm leading-5 text-gray-700 hover:bg-gray-100 lg:hover:bg-transparent hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900',
-                          {
-                            // @ts-ignore Shopify - Fix this types
-                            underline: activeBrand?.entityId === node.entityId,
-                          }
-                        )}
-                      >
-                        <Link
-                          href={{
-                            pathname: getDesignerPath(node.path, category),
-                            query,
-                          }}
-                        >
-                          <a
-                            onClick={(e) => handleClick(e, 'brands')}
-                            className={
-                              'block lg:inline-block px-4 py-2 lg:p-0 lg:my-2 lg:mx-4'
-                            }
-                          >
-                            {node.name}
-                          </a>
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
         {/* Products */}
-        <div className="col-span-8 order-3 lg:order-none">
+        <div className="col-span-12 order-3 lg:order-none">
           {(q || activeCategory || activeBrand) && (
             <div className="mb-12 transition ease-in duration-75">
               {data ? (
@@ -763,11 +479,21 @@ export default function Search({
                     Showing{' '}
                     {
                       /* TODO : do it within the products request */
-                      data.products.filter(
-                        (el) =>
-                          el.price.value >= minPriceFilter &&
-                          el.price.value <= maxPriceFilter
-                      ).length
+                      data.products
+                        .filter(
+                          (el) =>
+                            el.price.value >= minPriceFilter &&
+                            el.price.value <= maxPriceFilter
+                        )
+                        .filter((el) =>
+                          activeFilters
+                            .map((item) => item.value)
+                            .every((item) =>
+                              el.categories.edges
+                                .map((i: any) => i.node.name)
+                                .includes(item)
+                            )
+                        ).length
                     }{' '}
                     results{' '}
                     {q && (
@@ -814,6 +540,15 @@ export default function Search({
                       el.price.value >= minPriceFilter &&
                       el.price.value <= maxPriceFilter
                   )
+                  .filter((el) =>
+                    activeFilters
+                      .map((item) => item.value)
+                      .every((item) =>
+                        el.categories.edges
+                          .map((i: any) => i.node.name)
+                          .includes(item)
+                      )
+                  )
                   .map((product: Product) => {
                     /*
                     product.customFields.edges.forEach((el: any) => {
@@ -823,14 +558,19 @@ export default function Search({
                     });
                     */
                     return (
-                      <ProductCard
-                        variant="simple"
-                        key={product.path}
-                        className="animated fadeIn"
+                      <ProductCard2
+                        key={product.id}
+                        link={'/product/' + product.slug}
+                        title={product.name}
+                        variant="details"
+                        imageSrc={product.images[0].url}
+                        imageSrc2={
+                          product.images.length > 1 ? product.images[1].url : ''
+                        }
                         product={product}
                         imgProps={{
-                          width: 480,
-                          height: 480,
+                          width: 206,
+                          height: 256,
                         }}
                       />
                     )
@@ -849,101 +589,8 @@ export default function Search({
             </Grid>
           )}
         </div>
-
-        {/* Sort */}
-        <div className="col-span-8 lg:col-span-2 order-2 lg:order-none">
-          <div className="relative inline-block w-full">
-            <div className="lg:hidden">
-              <span className="rounded-md shadow-sm">
-                <button
-                  type="button"
-                  onClick={(e) => handleClick(e, 'sort')}
-                  className="flex justify-between w-full rounded-sm border border-gray-300 px-4 py-3 bg-white text-sm leading-5 font-medium text-gray-700 hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-normal active:bg-gray-50 active:text-gray-800 transition ease-in-out duration-150"
-                  id="options-menu"
-                  aria-haspopup="true"
-                  aria-expanded="true"
-                >
-                  {sort ? `Sort: ${sort}` : 'Relevance'}
-                  <svg
-                    className="-mr-1 ml-2 h-5 w-5"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </button>
-              </span>
-            </div>
-            <div
-              className={`origin-top-left absolute lg:relative left-0 mt-2 w-full rounded-md shadow-lg lg:shadow-none z-10 mb-10 lg:block ${
-                activeFilter !== 'sort' || toggleFilter !== true ? 'hidden' : ''
-              }`}
-            >
-              <div className="rounded-sm bg-white shadow-xs lg:bg-none lg:shadow-none">
-                <div
-                  role="menu"
-                  aria-orientation="vertical"
-                  aria-labelledby="options-menu"
-                >
-                  <ul>
-                    <li
-                      className={cn(
-                        'block text-sm leading-5 text-gray-700 lg:text-base lg:no-underline lg:font-bold lg:tracking-wide hover:bg-gray-100 lg:hover:bg-transparent hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900',
-                        {
-                          underline: !sort,
-                        }
-                      )}
-                    >
-                      <Link href={{ pathname, query: filterQuery({ q }) }}>
-                        <a
-                          onClick={(e) => handleClick(e, 'sort')}
-                          className={
-                            'block lg:inline-block px-4 py-2 lg:p-0 lg:my-2 lg:mx-4'
-                          }
-                        >
-                          Relevance
-                        </a>
-                      </Link>
-                    </li>
-                    {SORT.map(([key, text]) => (
-                      <li
-                        key={key}
-                        className={cn(
-                          'block text-sm leading-5 text-gray-700 hover:bg-gray-100 lg:hover:bg-transparent hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900',
-                          {
-                            underline: sort === key,
-                          }
-                        )}
-                      >
-                        <Link
-                          href={{
-                            pathname,
-                            query: filterQuery({ q, sort: key }),
-                          }}
-                        >
-                          <a
-                            onClick={(e) => handleClick(e, 'sort')}
-                            className={
-                              'block lg:inline-block px-4 py-2 lg:p-0 lg:my-2 lg:mx-4'
-                            }
-                          >
-                            {text}
-                          </a>
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
+      <TopButton />
     </Container>
   )
 }

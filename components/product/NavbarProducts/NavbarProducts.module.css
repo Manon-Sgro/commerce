@@ -187,3 +187,15 @@
 .section_filters_value {
   color: #a1a1a1;
 }
+
+.section_filters_part_options {
+  display: flex;
+  grid-gap:.5rem;
+  flex-wrap:wrap;
+}
+
+.section_filters_part_options_item {
+  border: 1px solid rgba(84, 84, 84, 0.15);
+  padding: .5rem 1rem;
+  font-size:.9rem;
+}

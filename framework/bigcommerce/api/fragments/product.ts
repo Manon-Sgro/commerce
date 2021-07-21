@@ -46,11 +46,10 @@ export const productInfoFragment = /* GraphQL */ `
       entityId
     }
     description
-    customFields {
+    categories {
       edges {
         node {
           name
-          value
         }
       }
     }
