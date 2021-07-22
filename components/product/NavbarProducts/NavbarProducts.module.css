@@ -199,3 +199,14 @@
   padding: .5rem 1rem;
   font-size:.9rem;
 }
+
+.endItems {
+  text-transform:uppercase;
+  font-size:.9rem;
+  font-weight:700;
+  color:rgb(138, 138, 138);
+  display:flex;
+  justify-content:center;
+  width:100%;
+  text-align:center;
+}

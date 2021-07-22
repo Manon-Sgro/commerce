@@ -61,10 +61,6 @@ import {
 import { Product } from '@commerce/types'
 import ClickOutside from '../lib/click-outside'
 
-interface GetFilters {
-  data: any[]
-}
-
 export async function getStaticProps({
   preview,
   locale,
@@ -197,7 +193,7 @@ export default function Search({
   const classes = useStyles()
 
   return (
-    <Container>
+    <Container className="ml-20 mr-20">
       {activeCategory && activeCategory.name.startsWith('#') && (
         <Title
           title={`${activeCategory.name}`}
@@ -589,6 +585,9 @@ export default function Search({
             </Grid>
           )}
         </div>
+      </div>
+      <div className={s.endItems}>
+        Il n'y a pas d'autres articles disponibles.
       </div>
       <TopButton />
     </Container>

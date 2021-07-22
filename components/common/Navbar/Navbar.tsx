@@ -13,6 +13,14 @@ const closeMenu = (e: React.ChangeEvent<HTMLInputElement>) => {
   e.target.classList.remove('hover')
 }
 
+const submenus = [
+  { title: 'Saison', children: ['Ete', 'Hiver'] },
+  { title: 'Origine', children: ['Espagne', 'France', 'Kenya'] },
+  { title: 'Tendances', children: ['Bio', 'Produits locaux'] },
+  { title: 'Meilleures ventes', children: [] },
+  { title: 'Produits récents', children: [] },
+]
+
 const Navbar: FC = () => (
   <NavbarRoot>
     <Container>
@@ -36,7 +44,10 @@ const Navbar: FC = () => (
                   <ArrowDown className={s.icon} width={15} height={15} />
                 </a>
               </Link>
-              <FloatingMenu className={s.link__floating_floatingMenu} />
+              <FloatingMenu
+                className={s.link__floating_floatingMenu}
+                submenus={submenus}
+              />
             </div>
 
             <div className={s.link__floating}>
@@ -46,7 +57,10 @@ const Navbar: FC = () => (
                   <ArrowDown className={s.icon} width={15} height={15} />
                 </a>
               </Link>
-              <FloatingMenu className={s.link__floating_floatingMenu} />
+              <FloatingMenu
+                className={s.link__floating_floatingMenu}
+                submenus={submenus}
+              />
             </div>
 
             <div className={s.link__floating}>
@@ -56,7 +70,10 @@ const Navbar: FC = () => (
                   <ArrowDown className={s.icon} width={15} height={15} />
                 </a>
               </Link>
-              <FloatingMenu className={s.link__floating_floatingMenu} />
+              <FloatingMenu
+                className={s.link__floating_floatingMenu}
+                submenus={submenus}
+              />
             </div>
           </nav>
         </div>

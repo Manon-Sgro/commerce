@@ -48,32 +48,32 @@
   }
   1% {
     opacity: 0;
-    height: 500px;
+    height: auto;
     padding: 2rem;
-    display: block;
+    display: grid;
   }
 
   100% {
     opacity: 1;
-    height: 500px;
+    height: auto;
     padding: 2rem;
-    display: block;
+    display: grid;
   }
 }
 
 @keyframes opacityTransitionOff {
   0% {
     opacity: 1;
-    height: 500px;
+    height: auto;
     padding: 2rem;
-    display: block;
+    display: grid;
   }
 
   99% {
     opacity: 0;
-    height: 500px;
+    height: auto;
     padding: 2rem;
-    display: block;
+    display: grid;
   }
   100%{
       opacity: 0;
@@ -90,7 +90,7 @@
 }
 
 .link__floating:hover .link__floating_floatingMenu, .link__floating:focus .link__floating_floatingMenu {
-  display: block;
-  height:500px;
+  display: grid;
+  height:auto;
   animation: opacityTransitionOn .2s forwards;
 }

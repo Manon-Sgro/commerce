@@ -1,12 +1,50 @@
-.root{
-    width: 600px;
-    height: 500px;
-
-    position:absolute;
-    top:100%;
-    left:0;
-
-    padding:2rem;
-
-    background:#fff;
+.root {
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  grid-gap:2rem;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  padding: 2rem;
+  background: #fff;
+  color: #000;
 }
+
+.root_section{
+    min-width:150px;
+}
+
+.root_section:nth-child(2n){
+    grid-column:2;
+}
+
+.root_section_title {
+  text-transform:uppercase;
+  font-weight:700;
+  font-size:.9rem;
+}
+
+.root_section_item {
+  min-width: 150px;
+  font-size: 1rem;
+}
+
+.root_section_title a, .root_section_item a{
+  position:relative;
+}
+
+  .root_section_title a::after, .root_section_item a::after {
+    background: #000;
+    width: 0%;
+    height: 2px;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    content: "";
+    display: block;
+    transition:all .5s ease;
+  }
+
+  .root_section_title:hover a::after, .root_section_item:hover a::after {
+    width: 100%;
+  }
