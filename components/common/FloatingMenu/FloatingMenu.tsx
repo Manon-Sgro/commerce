@@ -7,23 +7,37 @@ import Link from 'next/link'
 
 interface Props {
   className?: string
-  submenus: { title: string; children: string[] }[]
+  menu: string
+  submenus: {
+    title: string
+    path?: string
+    sort?: string
+    children: { name: string; path?: string; query?: string }[]
+  }[]
 }
 
-const FloatingMenu: FC<Props> = ({ className, submenus }) => {
+const FloatingMenu: FC<Props> = ({ className, submenus, menu }) => {
   return (
     <div className={`${className} ${s.root}`}>
       {submenus.map((el) => (
         <ul className={s.root_section}>
           <li className={s.root_section_title}>
-            <Link href={`/search/${el.title}`}>
+            <Link
+              href={`/search${menu}${el.path ? el.path : '?sort=' + el.sort}`}
+            >
               <a>{el.title}</a>
             </Link>
           </li>
           {el.children.map((child) => (
             <li className={s.root_section_item}>
-              <Link href={`/search/${el.title}/${child}`}>
-                <a>{child}</a>
+              <Link
+                href={`/search${menu}${el.path ? el.path : ''}${
+                  child.path ? child.path : '?q=' + child.query
+                }${child.query && el.sort ? '&' : '?'}${
+                  el.sort ? 'sort=' + el.sort : ''
+                }`}
+              >
+                <a>{child.name}</a>
               </Link>
             </li>
           ))}

@@ -13,12 +13,35 @@ const closeMenu = (e: React.ChangeEvent<HTMLInputElement>) => {
   e.target.classList.remove('hover')
 }
 
+// TODO : get from categories
 const submenus = [
-  { title: 'Saison', children: ['Ete', 'Hiver'] },
-  { title: 'Origine', children: ['Espagne', 'France', 'Kenya'] },
-  { title: 'Tendances', children: ['Bio', 'Produits locaux'] },
-  { title: 'Meilleures ventes', children: [] },
-  { title: 'Produits récents', children: [] },
+  {
+    title: 'Saison',
+    path: '/saison',
+    children: [
+      { name: 'Ete', path: '/ete' },
+      { name: 'Hiver', path: '/hiver' },
+    ],
+  },
+  {
+    title: 'Tendances',
+    sort: 'trending-desc',
+    children: [
+      { name: 'Bio', query: 'bio' },
+      { name: 'Produits locaux', query: 'local' },
+    ],
+  },
+  {
+    title: 'Origine',
+    path: '/origine',
+    children: [
+      { name: 'Espagne', path: '/espagne' },
+      { name: 'France', path: '/france' },
+      { name: 'Kenya', path: '/kenya' },
+    ],
+  },
+  { title: 'Meilleures ventes', sort: 'trending-desc', children: [] },
+  { title: 'Produits récents', sort: 'latest-desc', children: [] },
 ]
 
 const Navbar: FC = () => (
@@ -47,6 +70,7 @@ const Navbar: FC = () => (
               <FloatingMenu
                 className={s.link__floating_floatingMenu}
                 submenus={submenus}
+                menu="/fruits"
               />
             </div>
 
@@ -60,6 +84,7 @@ const Navbar: FC = () => (
               <FloatingMenu
                 className={s.link__floating_floatingMenu}
                 submenus={submenus}
+                menu="/legumes"
               />
             </div>
 
@@ -73,6 +98,7 @@ const Navbar: FC = () => (
               <FloatingMenu
                 className={s.link__floating_floatingMenu}
                 submenus={submenus}
+                menu="/paniers_composes"
               />
             </div>
           </nav>
