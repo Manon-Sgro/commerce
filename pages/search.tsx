@@ -472,7 +472,7 @@ export default function Search({
                       hidden: !data.found,
                     })}
                   >
-                    Showing{' '}
+                    {' '}
                     {
                       /* TODO : do it within the products request */
                       data.products
@@ -491,10 +491,10 @@ export default function Search({
                             )
                         ).length
                     }{' '}
-                    results{' '}
+                    résultats{' '}
                     {q && (
                       <>
-                        for "<strong>{q}</strong>"
+                        pour "<strong>{q}</strong>"
                       </>
                     )}
                   </span>
@@ -506,22 +506,21 @@ export default function Search({
                   >
                     {q ? (
                       <>
-                        There are no products that match "<strong>{q}</strong>"
+                        Aucun produit ne correspond à "<strong>{q}</strong>"
                       </>
                     ) : (
                       <>
-                        There are no products that match the selected category &
-                        designer
+                        Aucun produit ne correspond à la catégorie selectionnée.
                       </>
                     )}
                   </span>
                 </>
               ) : q ? (
                 <>
-                  Searching for: "<strong>{q}</strong>"
+                  Recherche pour : "<strong>{q}</strong>"
                 </>
               ) : (
-                <>Searching...</>
+                <>Recherche en cours...</>
               )}
             </div>
           )}

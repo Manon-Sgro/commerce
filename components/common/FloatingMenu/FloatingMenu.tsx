@@ -4,6 +4,7 @@ import s from './FloatingMenu.module.css'
 import { useRouter } from 'next/router'
 import { Button } from '../../ui'
 import Link from 'next/link'
+import { useSearchMeta } from '@lib/search'
 
 interface Props {
   className?: string
@@ -31,7 +32,7 @@ const FloatingMenu: FC<Props> = ({ className, submenus, menu }) => {
           {el.children.map((child) => (
             <li className={s.root_section_item}>
               <Link
-                href={`/search${menu}${el.path ? el.path : ''}${
+                href={`/search${menu}${
                   child.path ? child.path : '?q=' + child.query
                 }${child.query && el.sort ? '&' : '?'}${
                   el.sort ? 'sort=' + el.sort : ''
