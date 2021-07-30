@@ -1,14 +1,20 @@
 import cn from 'classnames'
 import type { GetStaticPropsContext, InferGetStaticPropsType } from 'next'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 
-import { DoubleSlider, Layout, NavbarLinks, Title } from '@components/common'
-import { NavbarProducts, ProductCard } from '@components/product'
+import {
+  DoubleSlider,
+  Layout,
+  NavbarLinks,
+  Title,
+  TopButton,
+} from '@components/common'
+import { NavbarProducts, ProductCard2 } from '@components/product'
 import s from '@components/product/NavbarProducts/NavbarProducts.module.css'
 import { Container, Grid, Skeleton } from '@components/ui'
-import { ArrowDown, Menu, Circle } from '@components/icons'
+import { ArrowDown, Menu, Circle, Cross } from '@components/icons'
 
 import { getConfig } from '@framework/api'
 import useSearch from '@framework/product/use-search'
@@ -132,11 +138,62 @@ export default function Search({
     handleClick(event, 'sort')
   }
 
+  const minProductPrice = 0
+  const [maxProductPrice] = useState(
+    data
+      ? data.products
+          .map((el) => el.price.value)
+          .reduce((max, currPrice) =>
+            currPrice > max ? Math.floor(currPrice) + 1 : max
+          )
+      : 1000
+  )
+  //const [maxProductPrice] = useState(50);
+  const [minPrice, setMinPrice] = useState(0)
+  const [maxPrice, setMaxPrice] = useState(maxProductPrice)
+  const [minPriceFilter, setMinPriceFilter] = useState(0)
+  const [maxPriceFilter, setMaxPriceFilter] = useState(maxProductPrice)
+  let subcategories = []
+  /*
+  const addSubcategory = (name: string) => {
+    setSubcategories((prevItems) => [
+      ...prevItems.filter((el) => el !== name),
+      name
+    ])
+  }
+  */
+
+  const [activeFilters, setActiveFilters] = useState<
+    { name: string; value: string }[]
+  >([])
+  // handle click event of the button to add item
+  const addActiveFilter = (name: string, value: string) => {
+    setActiveFilters((prevItems) => [
+      ...prevItems.filter((el) => el.name !== name),
+      {
+        name: name,
+        value: value,
+      },
+    ])
+  }
+  const removeActiveFilter = (name: string) => {
+    // reset filters
+    if (name === 'Min') {
+      setMinPriceFilter(minProductPrice)
+    }
+    if (name === 'Max') {
+      setMaxPriceFilter(maxProductPrice)
+    }
+
+    // remove filter from list
+    setActiveFilters(activeFilters.filter((el) => el.name !== name))
+  }
+
   // Material-UI accordion
   const classes = useStyles()
 
   return (
-    <Container>
+    <Container className="ml-20 mr-20">
       {activeCategory && activeCategory.name.startsWith('#') && (
         <Title
           title={`${activeCategory.name}`}
@@ -150,30 +207,32 @@ export default function Search({
       {!activeCategory && <Title title="Notre catalogue" />}
       {!activeCategory && (
         <NavbarLinks>
-          {categories.map((cat) => (
-            <li
-              key={cat.path}
-              className={cn(
-                'block text-sm leading-5 text-gray-700 hover:bg-gray-100 lg:hover:bg-transparent hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900'
-              )}
-            >
-              <Link
-                href={{
-                  pathname: getCategoryPath(cat.path, brand),
-                  query,
-                }}
+          {categories
+            .filter((el) => el.children.length == 0)
+            .map((cat) => (
+              <li
+                key={cat.path}
+                className={cn(
+                  'block text-sm leading-5 text-gray-700 hover:bg-gray-100 lg:hover:bg-transparent hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900'
+                )}
               >
-                <a
-                  onClick={(e) => handleClick(e, 'categories')}
-                  className={
-                    'block lg:inline-block px-4 py-2 lg:p-0 lg:my-2 lg:mx-4'
-                  }
+                <Link
+                  href={{
+                    pathname: getCategoryPath(cat.path, brand),
+                    query,
+                  }}
                 >
-                  {cat.name}
-                </a>
-              </Link>
-            </li>
-          ))}
+                  <a
+                    onClick={(e) => handleClick(e, 'categories')}
+                    className={
+                      'block lg:inline-block px-4 py-2 lg:p-0 lg:my-2 lg:mx-4'
+                    }
+                  >
+                    {cat.name}
+                  </a>
+                </Link>
+              </li>
+            ))}
         </NavbarLinks>
       )}
       {/* NavbarProducts */}
@@ -194,44 +253,80 @@ export default function Search({
               </button>
               {displayFilters && (
                 <div className={s.section_filters}>
+                  {activeFilters.length > 0 && (
+                    <section className={s.section_filters_part}>
+                      <div className={s.section_filters_part_title}>
+                        Filtres actifs
+                      </div>
+                      <ul>
+                        {activeFilters.map((filter) => (
+                          <li
+                            key={filter.name}
+                            className={`${s.section_filters_item}`}
+                          >
+                            <button
+                              className={`${s.section_nav_item_link} ${s.section_filters_btn}`}
+                              onClick={() => removeActiveFilter(filter.name)}
+                            >
+                              <div className={`${s.section_filters_btn_cross}`}>
+                                <Cross
+                                  width={12}
+                                  height={12}
+                                  stroke-width={4}
+                                />
+                              </div>
+                              <div className={`${s.section_filters_btn_name}`}>
+                                {filter.name}
+                              </div>
+                            </button>
+                            <div className={`${s.section_filters_value}`}>
+                              {filter.value}
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </section>
+                  )}
                   <section className={s.section_filters_part}>
                     <div className={s.section_filters_part_title}>
                       Catégories de produits
                     </div>
                     <ul>
-                      {categories.map((cat) => (
-                        <li
-                          key={cat.path}
-                          className={`${s.section_filters_part_item} ${s.section_nav_item_link}`}
-                        >
-                          <Circle
-                            width={15}
-                            height={15}
-                            fillColor={
-                              activeCategory?.entityId === cat.entityId
-                                ? '#EC7A5C'
-                                : 'none'
-                            }
-                          />
-                          <Link
-                            href={{
-                              pathname: getCategoryPath(cat.path, brand),
-                              query,
-                            }}
+                      {categories
+                        .filter((el) => el.children.length == 0)
+                        .map((cat) => (
+                          <li
+                            key={cat.path}
+                            className={`${s.section_filters_part_item} ${s.section_nav_item_link}`}
                           >
-                            <a
-                              onClick={(e) => handleClick(e, 'categories')}
-                              className={
+                            <Circle
+                              width={15}
+                              height={15}
+                              fillColor={
                                 activeCategory?.entityId === cat.entityId
-                                  ? s.section_filters_part_item__bold
-                                  : ''
+                                  ? '#EC7A5C'
+                                  : 'none'
                               }
+                            />
+                            <Link
+                              href={{
+                                pathname: getCategoryPath(cat.path, brand),
+                                query,
+                              }}
                             >
-                              {cat.name}
-                            </a>
-                          </Link>
-                        </li>
-                      ))}
+                              <a
+                                onClick={(e) => handleClick(e, 'categories')}
+                                className={
+                                  activeCategory?.entityId === cat.entityId
+                                    ? s.section_filters_part_item__bold
+                                    : ''
+                                }
+                              >
+                                {cat.name}
+                              </a>
+                            </Link>
+                          </li>
+                        ))}
                     </ul>
                   </section>
                   <section className={s.section_filters_part}>
@@ -239,19 +334,65 @@ export default function Search({
                       Filtrer par prix
                     </div>
                     <DoubleSlider
-                      min={0}
-                      max={1000}
-                      onChange={({ min, max }: { min: number; max: number }) =>
-                        console.log(`min = ${min}, max = ${max}`)
-                      }
+                      min={minProductPrice}
+                      max={maxProductPrice}
+                      onChange={({
+                        min,
+                        max,
+                      }: {
+                        min: number
+                        max: number
+                      }) => {
+                        setMinPrice(min)
+                        setMaxPrice(max)
+                      }}
                     />
-                    <button className={s.section_nav_item_link}>Filtrer</button>
-                  </section>
-                  <section className={s.section_filters_part}>
-                    <div className={s.section_filters_part_title}>
-                      Filtrer par saisons
+                    <div className={s.section_filters_price_actions}>
+                      <div className={s.section_filters_price_actions_infos}>
+                        Prix: {minPrice}€ — {maxPrice}€
+                      </div>
+                      <button
+                        className={s.section_filters_price_actions_btn}
+                        onClick={() => {
+                          addActiveFilter('Min', minPrice.toString() + '€')
+                          addActiveFilter('Max', maxPrice.toString() + '€')
+                          setMinPriceFilter(minPrice)
+                          setMaxPriceFilter(maxPrice)
+                        }}
+                      >
+                        Filtrer
+                      </button>
                     </div>
                   </section>
+                  {categories.map((cat) => {
+                    if (cat.children.length > 0) {
+                      return (
+                        <section
+                          key={cat.name}
+                          className={s.section_filters_part}
+                        >
+                          <div className={s.section_filters_part_title}>
+                            Filtrer par {cat.name}
+                          </div>
+                          <ul className={s.section_filters_part_options}>
+                            {cat.children.map((subcat) => (
+                              <li
+                                className={s.section_filters_part_options_item}
+                              >
+                                <button
+                                  onClick={() => {
+                                    addActiveFilter(cat.name, subcat.name)
+                                  }}
+                                >
+                                  {subcat.name}
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                        </section>
+                      )
+                    }
+                  })}
                 </div>
               )}
             </div>
@@ -319,274 +460,8 @@ export default function Search({
         </nav>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mt-3 mb-20">
-        <div className="col-span-8 lg:col-span-2 order-1 lg:order-none">
-          {/* Categories */}
-          <div className="relative inline-block w-full">
-            <div className="lg:hidden">
-              <span className="rounded-md shadow-sm">
-                <button
-                  type="button"
-                  onClick={(e) => handleClick(e, 'categories')}
-                  className="flex justify-between w-full rounded-sm border border-gray-300 px-4 py-3 bg-white text-sm leading-5 font-medium text-gray-700 hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-normal active:bg-gray-50 active:text-gray-800 transition ease-in-out duration-150"
-                  id="options-menu"
-                  aria-haspopup="true"
-                  aria-expanded="true"
-                >
-                  {activeCategory?.name
-                    ? `Category: ${activeCategory?.name}`
-                    : 'All Categories'}
-                  <svg
-                    className="-mr-1 ml-2 h-5 w-5"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </button>
-              </span>
-            </div>
-            <div
-              className={`origin-top-left absolute lg:relative left-0 mt-2 w-full rounded-md shadow-lg lg:shadow-none z-10 mb-10 lg:block ${
-                activeFilter !== 'categories' || toggleFilter !== true
-                  ? 'hidden'
-                  : ''
-              }`}
-            >
-              <div className="rounded-sm bg-white shadow-xs lg:bg-none lg:shadow-none">
-                <div
-                  role="menu"
-                  aria-orientation="vertical"
-                  aria-labelledby="options-menu"
-                >
-                  <ul>
-                    <li
-                      className={cn(
-                        'block text-sm leading-5 text-gray-700 lg:text-base lg:no-underline lg:font-bold lg:tracking-wide hover:bg-gray-100 lg:hover:bg-transparent hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900',
-                        {
-                          underline: !activeCategory?.name,
-                        }
-                      )}
-                    >
-                      <Link
-                        href={{ pathname: getCategoryPath('', brand), query }}
-                      >
-                        <a
-                          onClick={(e) => handleClick(e, 'categories')}
-                          className={
-                            'block lg:inline-block px-4 py-2 lg:p-0 lg:my-2 lg:mx-4'
-                          }
-                        >
-                          All Categories
-                        </a>
-                      </Link>
-                    </li>
-                    {categories.map((cat) => (
-                      <li
-                        key={cat.path}
-                        className={cn(
-                          'block text-sm leading-5 text-gray-700 hover:bg-gray-100 lg:hover:bg-transparent hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900',
-                          {
-                            underline:
-                              activeCategory?.entityId === cat.entityId,
-                          }
-                        )}
-                      >
-                        {cat.children.length > 0 ? (
-                          <Accordion>
-                            <AccordionSummary
-                              expandIcon={<ExpandMoreIcon />}
-                              aria-controls="panel1a-content"
-                              id="panel1a-header"
-                            >
-                              <Link
-                                href={{
-                                  pathname: getCategoryPath(cat.path, brand),
-                                  query,
-                                }}
-                              >
-                                <a
-                                  onClick={(e) => handleClick(e, 'categories')}
-                                  className={
-                                    'block lg:inline-block px-4 py-2 lg:p-0 lg:my-2 lg:mx-4'
-                                  }
-                                >
-                                  {cat.name}
-                                </a>
-                              </Link>
-                            </AccordionSummary>
-                            <AccordionDetails>
-                              <ul>
-                                {cat.children.map((subcat) => (
-                                  <li
-                                    key={subcat.path}
-                                    className={cn(
-                                      'block text-sm leading-5 text-gray-700 hover:bg-gray-100 lg:hover:bg-transparent hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900',
-                                      {
-                                        underline:
-                                          activeCategory?.entityId ===
-                                          subcat.entityId,
-                                      }
-                                    )}
-                                  >
-                                    <Link
-                                      href={{
-                                        pathname: getCategoryPath(
-                                          subcat.path,
-                                          brand
-                                        ),
-                                        query,
-                                      }}
-                                    >
-                                      <a
-                                        onClick={(e) =>
-                                          handleClick(e, 'categories')
-                                        }
-                                        className={
-                                          'block lg:inline-block px-4 py-2 lg:p-0 lg:my-2 lg:mx-4'
-                                        }
-                                      >
-                                        {subcat.name}
-                                      </a>
-                                    </Link>
-                                  </li>
-                                ))}
-                              </ul>
-                            </AccordionDetails>
-                          </Accordion>
-                        ) : (
-                          <Link
-                            href={{
-                              pathname: getCategoryPath(cat.path, brand),
-                              query,
-                            }}
-                          >
-                            <a
-                              onClick={(e) => handleClick(e, 'categories')}
-                              className={
-                                'block lg:inline-block px-4 py-2 lg:p-0 lg:my-2 lg:mx-4'
-                              }
-                            >
-                              {cat.name}
-                            </a>
-                          </Link>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Designs */}
-          <div className="relative inline-block w-full">
-            <div className="lg:hidden mt-3">
-              <span className="rounded-md shadow-sm">
-                <button
-                  type="button"
-                  onClick={(e) => handleClick(e, 'brands')}
-                  className="flex justify-between w-full rounded-sm border border-gray-300 px-4 py-3 bg-white text-sm leading-5 font-medium text-gray-900 hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-normal active:bg-gray-50 active:text-gray-800 transition ease-in-out duration-150"
-                  id="options-menu"
-                  aria-haspopup="true"
-                  aria-expanded="true"
-                >
-                  {activeBrand?.name
-                    ? `Design: ${activeBrand?.name}`
-                    : 'All Designs'}
-                  <svg
-                    className="-mr-1 ml-2 h-5 w-5"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </button>
-              </span>
-            </div>
-            <div
-              className={`origin-top-left absolute lg:relative left-0 mt-2 w-full rounded-md shadow-lg lg:shadow-none z-10 mb-10 lg:block ${
-                activeFilter !== 'brands' || toggleFilter !== true
-                  ? 'hidden'
-                  : ''
-              }`}
-            >
-              <div className="rounded-sm bg-white shadow-xs lg:bg-none lg:shadow-none">
-                <div
-                  role="menu"
-                  aria-orientation="vertical"
-                  aria-labelledby="options-menu"
-                >
-                  <ul>
-                    <li
-                      className={cn(
-                        'block text-sm leading-5 text-gray-700 lg:text-base lg:no-underline lg:font-bold lg:tracking-wide hover:bg-gray-100 lg:hover:bg-transparent hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900',
-                        {
-                          underline: !activeBrand?.name,
-                        }
-                      )}
-                    >
-                      <Link
-                        href={{
-                          pathname: getDesignerPath('', category),
-                          query,
-                        }}
-                      >
-                        <a
-                          onClick={(e) => handleClick(e, 'brands')}
-                          className={
-                            'block lg:inline-block px-4 py-2 lg:p-0 lg:my-2 lg:mx-4'
-                          }
-                        >
-                          All Designers
-                        </a>
-                      </Link>
-                    </li>
-                    {brands.flatMap(({ node }) => (
-                      <li
-                        key={node.path}
-                        className={cn(
-                          'block text-sm leading-5 text-gray-700 hover:bg-gray-100 lg:hover:bg-transparent hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900',
-                          {
-                            // @ts-ignore Shopify - Fix this types
-                            underline: activeBrand?.entityId === node.entityId,
-                          }
-                        )}
-                      >
-                        <Link
-                          href={{
-                            pathname: getDesignerPath(node.path, category),
-                            query,
-                          }}
-                        >
-                          <a
-                            onClick={(e) => handleClick(e, 'brands')}
-                            className={
-                              'block lg:inline-block px-4 py-2 lg:p-0 lg:my-2 lg:mx-4'
-                            }
-                          >
-                            {node.name}
-                          </a>
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
         {/* Products */}
-        <div className="col-span-8 order-3 lg:order-none">
+        <div className="col-span-12 order-3 lg:order-none">
           {(q || activeCategory || activeBrand) && (
             <div className="mb-12 transition ease-in duration-75">
               {data ? (
@@ -597,10 +472,29 @@ export default function Search({
                       hidden: !data.found,
                     })}
                   >
-                    Showing {data.products.length} results{' '}
+                    {' '}
+                    {
+                      /* TODO : do it within the products request */
+                      data.products
+                        .filter(
+                          (el) =>
+                            el.price.value >= minPriceFilter &&
+                            el.price.value <= maxPriceFilter
+                        )
+                        .filter((el) =>
+                          activeFilters
+                            .map((item) => item.value)
+                            .every((item) =>
+                              el.categories.edges
+                                .map((i: any) => i.node.name)
+                                .includes(item)
+                            )
+                        ).length
+                    }{' '}
+                    résultats{' '}
                     {q && (
                       <>
-                        for "<strong>{q}</strong>"
+                        pour "<strong>{q}</strong>"
                       </>
                     )}
                   </span>
@@ -612,40 +506,71 @@ export default function Search({
                   >
                     {q ? (
                       <>
-                        There are no products that match "<strong>{q}</strong>"
+                        Aucun produit ne correspond à "<strong>{q}</strong>"
                       </>
                     ) : (
                       <>
-                        There are no products that match the selected category &
-                        designer
+                        Aucun produit ne correspond à la catégorie selectionnée.
                       </>
                     )}
                   </span>
                 </>
               ) : q ? (
                 <>
-                  Searching for: "<strong>{q}</strong>"
+                  Recherche pour : "<strong>{q}</strong>"
                 </>
               ) : (
-                <>Searching...</>
+                <>Recherche en cours...</>
               )}
             </div>
           )}
 
           {data ? (
             <Grid layout="normal">
-              {data.products.map((product: Product) => (
-                <ProductCard
-                  variant="simple"
-                  key={product.path}
-                  className="animated fadeIn"
-                  product={product}
-                  imgProps={{
-                    width: 480,
-                    height: 480,
-                  }}
-                />
-              ))}
+              {
+                /* TODO : do it within the products request */
+                data.products
+                  .filter(
+                    (el) =>
+                      el.price.value >= minPriceFilter &&
+                      el.price.value <= maxPriceFilter
+                  )
+                  .filter((el) =>
+                    activeFilters
+                      .map((item) => item.value)
+                      .every((item) =>
+                        el.categories.edges
+                          .map((i: any) => i.node.name)
+                          .includes(item)
+                      )
+                  )
+                  .map((product: Product) => {
+                    /*
+                    product.customFields.edges.forEach((el: any) => {
+                      if (enabledFiltersNames.includes(el.node.name.toLowerCase())) {
+                        addFilterValues(el.node.value, el.node.name.toLowerCase());
+                      }
+                    });
+                    */
+                    return (
+                      <ProductCard2
+                        key={product.id}
+                        link={'/product/' + product.slug}
+                        title={product.name}
+                        variant="details"
+                        imageSrc={product.images[0].url}
+                        imageSrc2={
+                          product.images.length > 1 ? product.images[1].url : ''
+                        }
+                        product={product}
+                        imgProps={{
+                          width: 206,
+                          height: 256,
+                        }}
+                      />
+                    )
+                  })
+              }
             </Grid>
           ) : (
             <Grid layout="normal">
@@ -659,101 +584,11 @@ export default function Search({
             </Grid>
           )}
         </div>
-
-        {/* Sort */}
-        <div className="col-span-8 lg:col-span-2 order-2 lg:order-none">
-          <div className="relative inline-block w-full">
-            <div className="lg:hidden">
-              <span className="rounded-md shadow-sm">
-                <button
-                  type="button"
-                  onClick={(e) => handleClick(e, 'sort')}
-                  className="flex justify-between w-full rounded-sm border border-gray-300 px-4 py-3 bg-white text-sm leading-5 font-medium text-gray-700 hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-normal active:bg-gray-50 active:text-gray-800 transition ease-in-out duration-150"
-                  id="options-menu"
-                  aria-haspopup="true"
-                  aria-expanded="true"
-                >
-                  {sort ? `Sort: ${sort}` : 'Relevance'}
-                  <svg
-                    className="-mr-1 ml-2 h-5 w-5"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </button>
-              </span>
-            </div>
-            <div
-              className={`origin-top-left absolute lg:relative left-0 mt-2 w-full rounded-md shadow-lg lg:shadow-none z-10 mb-10 lg:block ${
-                activeFilter !== 'sort' || toggleFilter !== true ? 'hidden' : ''
-              }`}
-            >
-              <div className="rounded-sm bg-white shadow-xs lg:bg-none lg:shadow-none">
-                <div
-                  role="menu"
-                  aria-orientation="vertical"
-                  aria-labelledby="options-menu"
-                >
-                  <ul>
-                    <li
-                      className={cn(
-                        'block text-sm leading-5 text-gray-700 lg:text-base lg:no-underline lg:font-bold lg:tracking-wide hover:bg-gray-100 lg:hover:bg-transparent hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900',
-                        {
-                          underline: !sort,
-                        }
-                      )}
-                    >
-                      <Link href={{ pathname, query: filterQuery({ q }) }}>
-                        <a
-                          onClick={(e) => handleClick(e, 'sort')}
-                          className={
-                            'block lg:inline-block px-4 py-2 lg:p-0 lg:my-2 lg:mx-4'
-                          }
-                        >
-                          Relevance
-                        </a>
-                      </Link>
-                    </li>
-                    {SORT.map(([key, text]) => (
-                      <li
-                        key={key}
-                        className={cn(
-                          'block text-sm leading-5 text-gray-700 hover:bg-gray-100 lg:hover:bg-transparent hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900',
-                          {
-                            underline: sort === key,
-                          }
-                        )}
-                      >
-                        <Link
-                          href={{
-                            pathname,
-                            query: filterQuery({ q, sort: key }),
-                          }}
-                        >
-                          <a
-                            onClick={(e) => handleClick(e, 'sort')}
-                            className={
-                              'block lg:inline-block px-4 py-2 lg:p-0 lg:my-2 lg:mx-4'
-                            }
-                          >
-                            {text}
-                          </a>
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
+      <div className={s.endItems}>
+        Il n'y a pas d'autres articles disponibles.
+      </div>
+      <TopButton />
     </Container>
   )
 }

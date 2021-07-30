@@ -96,13 +96,13 @@
   top:0;
   left:0;
   width: 25vw;
-  min-height:100vh;
+  max-height:100vh;
 
   z-index:999;
 
   background-color: #fff;
 
-  overflow-y:auto;
+  overflow-y: auto;
 }
 
 .section_filters_bg {
@@ -124,7 +124,7 @@
   font-size: .9rem;
   font-weight: 700;
   text-transform: uppercase;
-  margin-bottom:1rem;
+  margin-bottom:2rem;
 }
 
 .section_filters_part_item {
@@ -141,3 +141,72 @@
     font-weight:700;
 }
 
+.section_filters_price_actions{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+.section_filters_price_actions_infos {
+  font-size: .8rem;
+  font-weight: bold;
+  color: rgba(84, 84, 84, 0.55);
+}
+.section_filters_price_actions_btn {
+  font-size: .9rem;
+  font-weight: bold;
+  color: rgb(236, 122, 92);
+  text-transform:uppercase;
+  transition: all .2s;
+}
+  .section_filters_price_actions_btn:hover, .section_filters_price_actions_btn:focus {
+    color: #000;
+    transition: all .2s;
+  }
+
+.section_filters_item {
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  font-size:.9rem;
+  grid-gap:.5rem;
+}
+.section_filters_btn {
+  display: flex;
+  align-items: center;
+  grid-gap: .5rem;
+}
+.section_filters_btn_name{
+    font-weight:bold;
+}
+.section_filters_btn_cross {
+  padding: 2px;
+  background: #ec7a5c;
+  border-radius: 2px;
+  color: #fff;
+}
+.section_filters_value {
+  color: #a1a1a1;
+}
+
+.section_filters_part_options {
+  display: flex;
+  grid-gap:.5rem;
+  flex-wrap:wrap;
+}
+
+.section_filters_part_options_item {
+  border: 1px solid rgba(84, 84, 84, 0.15);
+  padding: .5rem 1rem;
+  font-size:.9rem;
+}
+
+.endItems {
+  text-transform:uppercase;
+  font-size:.9rem;
+  font-weight:700;
+  color:rgb(138, 138, 138);
+  display:flex;
+  justify-content:center;
+  width:100%;
+  text-align:center;
+}

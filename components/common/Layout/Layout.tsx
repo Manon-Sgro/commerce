@@ -13,6 +13,10 @@ import LoginView from '@components/auth/LoginView'
 import { CommerceProvider } from '@framework'
 import type { Page } from '@framework/common/get-all-pages'
 
+import type { GetStaticPropsContext, InferGetStaticPropsType } from 'next'
+import getSiteInfo from '@framework/common/get-site-info'
+import { getConfig } from '@framework/api'
+
 const Loading = () => (
   <div className="w-80 h-80 flex items-center text-center justify-center p-3">
     <LoadingDots />
@@ -58,6 +62,7 @@ const Layout: FC<Props> = ({
   } = useUI()
   const { acceptedCookies, onAcceptCookies } = useAcceptCookies()
   const { locale = 'en-US' } = useRouter()
+
   return (
     <CommerceProvider locale={locale}>
       <div className={cn(s.root)}>

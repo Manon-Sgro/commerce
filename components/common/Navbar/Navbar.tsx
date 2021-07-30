@@ -13,6 +13,37 @@ const closeMenu = (e: React.ChangeEvent<HTMLInputElement>) => {
   e.target.classList.remove('hover')
 }
 
+// TODO : get from categories
+const submenus = [
+  {
+    title: 'Saison',
+    path: '/saison',
+    children: [
+      { name: 'Ete', path: '/ete' },
+      { name: 'Hiver', path: '/hiver' },
+    ],
+  },
+  {
+    title: 'Tendances',
+    sort: 'trending-desc',
+    children: [
+      { name: 'Bio', query: 'bio' },
+      { name: 'Produits locaux', query: 'local' },
+    ],
+  },
+  {
+    title: 'Origine',
+    path: '/origine',
+    children: [
+      { name: 'Espagne', path: '/espagne' },
+      { name: 'France', path: '/france' },
+      { name: 'Kenya', path: '/kenya' },
+    ],
+  },
+  { title: 'Meilleures ventes', sort: 'trending-desc', children: [] },
+  { title: 'Produits récents', sort: 'latest-desc', children: [] },
+]
+
 const Navbar: FC = () => (
   <NavbarRoot>
     <Container>
@@ -36,7 +67,11 @@ const Navbar: FC = () => (
                   <ArrowDown className={s.icon} width={15} height={15} />
                 </a>
               </Link>
-              <FloatingMenu className={s.link__floating_floatingMenu} />
+              <FloatingMenu
+                className={s.link__floating_floatingMenu}
+                submenus={submenus}
+                menu="/fruits"
+              />
             </div>
 
             <div className={s.link__floating}>
@@ -46,7 +81,11 @@ const Navbar: FC = () => (
                   <ArrowDown className={s.icon} width={15} height={15} />
                 </a>
               </Link>
-              <FloatingMenu className={s.link__floating_floatingMenu} />
+              <FloatingMenu
+                className={s.link__floating_floatingMenu}
+                submenus={submenus}
+                menu="/legumes"
+              />
             </div>
 
             <div className={s.link__floating}>
@@ -56,7 +95,11 @@ const Navbar: FC = () => (
                   <ArrowDown className={s.icon} width={15} height={15} />
                 </a>
               </Link>
-              <FloatingMenu className={s.link__floating_floatingMenu} />
+              <FloatingMenu
+                className={s.link__floating_floatingMenu}
+                submenus={submenus}
+                menu="/paniers_composes"
+              />
             </div>
           </nav>
         </div>

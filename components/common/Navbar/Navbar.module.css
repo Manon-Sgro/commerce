@@ -42,21 +42,45 @@
 @keyframes opacityTransitionOn {
   0% {
     display: none;
+    grid-gap:0;
     height: 0;
     padding: 0;
     opacity: 0;
   }
   1% {
     opacity: 0;
-    height: 500px;
+    height: auto;
     padding: 2rem;
+    display: grid;
+    grid-gap:2rem;
+  }
+
+  100% {
+    opacity: 1;
+    height: auto;
+    padding: 2rem;
+    display: grid;
+    grid-gap: 2rem;
+  }
+}
+
+@keyframes opacityTransitionBlockOn {
+  0% {
+    display: none;
+    height: 0;
+    padding: 0;
+    opacity: 0;
+  }
+
+  1% {
+    opacity: 0;
+    height: auto;
     display: block;
   }
 
   100% {
     opacity: 1;
-    height: 500px;
-    padding: 2rem;
+    height: auto;
     display: block;
   }
 }
@@ -64,33 +88,68 @@
 @keyframes opacityTransitionOff {
   0% {
     opacity: 1;
-    height: 500px;
+    height: auto;
     padding: 2rem;
+    display: grid;
+    grid-gap: 2rem;
+  }
+
+  99% {
+    opacity: 0;
+    height: auto;
+    padding: 2rem;
+    display: grid;
+    grid-gap: 2rem;
+  }
+  100% {
+    opacity: 0;
+    height: 0;
+    padding: 0;
+    display: none;
+    grid-gap: 0;
+  }
+}
+
+@keyframes opacityTransitionBlockOff {
+  0% {
+    opacity: 1;
+    height: auto;
     display: block;
   }
 
   99% {
     opacity: 0;
-    height: 500px;
-    padding: 2rem;
+    height: auto;
     display: block;
   }
-  100%{
-      opacity: 0;
-      height:0;
-      padding:0;
-      display:none;
+
+  100% {
+    opacity: 0;
+    height: 0;
+    padding: 0;
+    display: none;
   }
 }
 
 .link__floating .link__floating_floatingMenu {
-    opacity:0;
-    height:0;
+  opacity: 0;
+  height: 0;
   animation: opacityTransitionOff .2s forwards;
 }
+  .link__floating .link__floating_floatingMenu ul, .link__floating .link__floating_floatingMenu li {
+    opacity: 0;
+    height: 0;
+    animation: opacityTransitionBlockOff .2s forwards;
+  }
 
-.link__floating:hover .link__floating_floatingMenu, .link__floating:focus .link__floating_floatingMenu {
-  display: block;
-  height:500px;
-  animation: opacityTransitionOn .2s forwards;
-}
+  .link__floating:hover .link__floating_floatingMenu, .link__floating:focus .link__floating_floatingMenu {
+    display: grid;
+    height: auto;
+    animation: opacityTransitionOn .2s forwards;
+  }
+
+  .link__floating:hover .link__floating_floatingMenu ul, .link__floating:focus .link__floating_floatingMenu ul, .link__floating:hover .link__floating_floatingMenu li, .link__floating:focus .link__floating_floatingMenu li {
+    display: block;
+    height: auto;
+    animation: opacityTransitionBlockOn .2s forwards;
+  }
